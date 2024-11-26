@@ -1,15 +1,15 @@
 ---
-title: "Where are Torontonians likely to get married"
-subtitle: "Analysing the different marriage offices around GTA"
+title: "How General Health Index (GHI) performs better to predict health levels"
+subtitle: "A comparitive analysis of GHI and BMI against body measurements"
 author: 
   - Aamishi Avarsekar
-thanks: "Code and data are available at: https://github.com/aamishi/marriages_weekly_reflection/tree/master"
+thanks: "Code and data are available at: https://github.com/aamishi/ImprovedGeneralHealthIndex/"
 date: today
 date-format: long
 abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
 format: pdf
 number-sections: true
-# bibliography: references.bib
+bibliography: references.bib
 ---
 
 ```{r}
@@ -17,30 +17,35 @@ number-sections: true
 #| warning: false
 #| message: false
 
-library(tidyverse)
-library(dplyr)
-library(arrow)
-library(knitr)
 
-data <- read_parquet("../data/analysis_data/analysis_data.parquet")
 ```
 
 
 # Introduction
 
-In this week's reflection exercise, I will take a look at where people from GTA are most likely to register their marriage. I will be using @citeR to simulate, test and analyse this data. I will download the data from @opendatatoronto.
+BMI is a common indicator for general health but it has its limitations. It does not take into consideration the actual body composition of an individual and other important factors such as sex and age. Through this paper, I would like to propose a new way categorising people based on other body measurements such as the waist-to-hip ratio and wrist and ankle circumferences measurements as they are more indicative of a person's visceral fat, this proving a more accurate representation of general health. I would like to propose a newer formula for General Health Index (GHI) through the BodyM dataset. I plan on using the Isaac Kuzmar dataset that has accurate measurements of body fat to create a Confusion Matrix to see how my model compares in providing more accurate body fat estimations through easlily measurable data such as waist and hip circumference.
 
 
 
-# Data 
 
-### point 1: general table to show a glimpse of the data
+
+
+# Data {#sec-data}
+
+## Overview
+
+
+Overview text
+
+## Measurement
+	
+Some paragraphs about how we go from a phenomena in the world to an entry in the dataset.
+
+
 ```{r}
-#| label: fig-general-data-todo
-#| fig-cap: General table TODO
+#| label: fig-bills
+#| fig-cap: Bills of penguins
 #| echo: false
-
-kable(data, caption = "Table: Sample Measurements of Subjects")
 ```
 
 Talk more about it.
@@ -52,11 +57,114 @@ Talk more about it.
 
 Talk way more about it. 
 
+## Predictor variables
+
+Add graphs, tables and text.
+
+Use sub-sub-headings for each outcome variable and feel free to combine a few into one if they go together naturally.
+
+
+
+
+
+
+
+
+# Model
+
+The goal of our modelling strategy is twofold. Firstly,...
+
+Here we briefly describe the Bayesian analysis model used to investigate... Background details and diagnostics are included in [Appendix -@sec-model-details].
+
+## Model set-up
+
+Define $y_i$ as the number of seconds that the plane remained aloft. Then $\beta_i$ is the wing width and $\gamma_i$ is the wing length, both measured in millimeters.  
+
+\begin{align} 
+y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
+\mu_i &= \alpha + \beta_i + \gamma_i\\
+\alpha &\sim \mbox{Normal}(0, 2.5) \\
+\beta &\sim \mbox{Normal}(0, 2.5) \\
+\gamma &\sim \mbox{Normal}(0, 2.5) \\
+\sigma &\sim \mbox{Exponential}(1)
+\end{align}
+
+We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
+
+
+### Model justification
+
+We expect a positive relationship between the size of the wings and time spent aloft. In particular...
+
+We can use maths by including latex between dollar signs, for instance $\theta$.
+
+
+# Results
+
+Our results are summarized in @tbl-modelresults.
+
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| label: tbl-modelresults
+#| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
+#| warning: false
+
+```
+
+
+
+
+# Discussion
+
+## First discussion point {#sec-first-point}
+
+If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this. 
+
+## Second discussion point
+
+Please don't use these as sub-heading labels - change them to be what your point actually is.
+
+## Third discussion point
+
+## Weaknesses and next steps
+
+Weaknesses and next steps should also be included.
+
+\newpage
+
+\appendix
+
+# Appendix {-}
+
+
+# Additional data details
+
+# Model details {#sec-model-details}
+
+## Posterior predictive check
+
+we compare the posterior with the prior. This shows... 
+
+```{r}
+#| eval: true
+#| echo: false
+#| message: false
+#| warning: false
+```
+
 
 
 \newpage
 
 
 # References
-
 
