@@ -7,26 +7,16 @@
 
 
 #### Workspace setup ####
-library(opendatatoronto)
 library(tidyverse)
 # [...UPDATE THIS...]
 
 #### Download data ####
-# get package
-package <- show_package("e28bc818-43d5-43f7-b5d9-bdfb4eda5feb")
-
-# get all resources for this package
-resources <- list_package_resources("e28bc818-43d5-43f7-b5d9-bdfb4eda5feb")
-
-# identify datastore resources; by default, Toronto Open Data sets datastore resource format to CSV for non-geospatial and GeoJSON for geospatial resources
-datastore_resources <- filter(resources, tolower(format) %in% c('csv', 'geojson'))
-
-# load the first datastore resource as a sample
-data <- filter(datastore_resources, row_number()==1) %>% 
-  get_resource()
-
+# get package ; DATASET FOR NEW BODY FAT MEASUREMENT
+#### Clean data ####
+measurements_data <- read_csv("./data/raw_data/local-train/measurements.csv")
+subject_sex_data <- read_csv("./data/raw_data/local-train/hwg_metadata.csv")
 
 #### Save data ####
-write_csv(data, "data/raw_data/raw_data.csv") 
-
+write_parquet(measurements_data, "data/raw_data/measurements_data.parquet")
+write_parquet(subject_sex_data, "data/raw_data/subject_sex_data.parquet")
          
