@@ -17,7 +17,10 @@ bibliography: references.bib
 #| warning: false
 #| message: false
 
-
+library(tidyverse)
+library(janitor)
+library(arrow)
+library(dplyr)
 ```
 
 
@@ -33,6 +36,90 @@ BMI is a common indicator for general health but it has its limitations. It does
 # Data {#sec-data}
 
 ## Overview
+
+## BMI Classification:
+```{r}
+#| warning: false
+#| message: false
+bmi_canada_gov <- data.frame(
+  Category = c("Underweight", "Normal weight", "Overweight", "Obese - Class I", "Obese - Class II", "Obese - Class III"),
+  `BMI Range` = c("Below 18.5", "18.5–24.9", "25.0–29.9", "30.0–34.9", "35.0–39.9", "40.0 and above")
+)
+
+# Create a table using knitr::kable
+knitr::kable(
+  bmi_canada_gov,
+  col.names = c("Category", "BMI Range"),
+  caption = "BMI Categories as per the Government of Canada Guidelines"
+)
+```
+### The difference between an underweight and normal person:
+Let us take a closer look at the BMI levels below 25 for underweight and normal weight adults.
+
+```{r}
+#| warning: false
+#| message: false
+body_mass_data_raw <- read_parquet("../data/raw_data/body_mass_data.parquet")
+body_mass_clean <- body_mass_data_raw %>%
+  clean_names() %>%
+  select(gender_m1f2, age, height_cm, w_kg, bmi, fat_mass_kg, fm, ffm_kg, bone_mass_kg, muscle_mass_kg) %>%
+  mutate(
+    bmi_category = case_when(
+      bmi < 18.5 ~ "Underweight",
+      bmi >= 18.5 & bmi <= 24.9 ~ "Normal weight",
+      bmi >= 25.0 & bmi <= 29.9 ~ "Overweight",
+      bmi >= 30.0 & bmi <= 34.9 ~ "Obese - Class I",
+      bmi >= 35.0 & bmi <= 39.9 ~ "Obese - Class II",
+      bmi >= 40.0 ~ "Obese - Class III"
+    ))
+
+# Data Section: Part 1: What is the difference between an underweight / athletic person / normal person:
+bmi_under_25 <- body_mass_clean %>%
+  filter(bmi < 25)
+
+ggplot(bmi_under_25, aes(x = bmi, y = fm)) +
+  geom_point(aes(color = bmi_category), alpha = 0.7) +
+  labs(
+    title = "BMI vs. Fat Mass by BMI Category",
+    x = "BMI",
+    y = "Fat Mass (kg)",
+    color = "BMI Category"
+  ) +
+  theme_minimal()
+
+```
+
+### The difference between a normal and overweight person:
+```{r}
+bmi_normal_over <- body_mass_clean %>%
+  filter(18.5 < bmi & bmi < 30)
+
+# this is what i chose
+ggplot(bmi_normal_over, aes(x = bmi, y = fm)) +
+  geom_point(aes(color = bmi_category), alpha = 0.7) +
+  labs(
+    title = "BMI vs. Fat Mass by BMI Category",
+    x = "BMI",
+    y = "Fat Mass (kg)",
+    color = "BMI Category"
+  ) +
+  theme_minimal()
+```
+
+### All categories
+```{r}
+# this is what i chose
+ggplot(body_mass_clean, aes(x = bmi, y = fm)) +
+  geom_point(aes(color = bmi_category), alpha = 0.7) +
+  geom_vline(xintercept = c(18.5, 25, 30), linetype = "dashed", color = "black", linewidth = 0.5, alpha = 0.5) +
+  labs(
+    title = "BMI vs. Fat Mass by BMI Category",
+    x = "BMI",
+    y = "Fat Mass (kg)",
+    color = "BMI Category"
+  ) +
+  theme_minimal()
+```
 
 
 Overview text

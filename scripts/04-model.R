@@ -8,30 +8,59 @@
 # Any other information needed? [...UPDATE THIS...]
 
 
-#### Workspace setup ####
+# Works pace setup - packages needed
 library(tidyverse)
 library(rstanarm)
-### Model data ####
 library(nnet)
+library(randomForest)
 
 #### Read data ####
-analysis_data <- read_parquet("data/analysis_data/analysis_data.parquet")
+cleaned_data <- read_parquet("data/analysis_data/measurements_analysis_data.parquet")
+body_mass_read <- read_parquet("data/analysis_data/body_mass_data.parquet")
 
 # Multinomial logistic regression model
 # subject_id, gender, height_cm, weight_kg, height, ankle, wrist, waist_hip_ratio, original_bmi
-multi_model <- multinom(category ~ weight_kg + height_cm + waist_hip_ratio + wrist + ankle, data = analysis_data)
+# Variables selected:
+measurements_model <- multinom(bmi_category ~ height + gender + waist_hip_ratio + height_hip_ratio, data = cleaned_data)
 # Summary of the model
-summary(multi_model)
+summary(measurements_model)
 
 
-analysis_data$predicted_category <- predict(multi_model, newdata = analysis_data)
-table(Predicted = analysis_data$predicted_category, Actual = body_mass_clean$category)
+#### Read data ####
+# body_mass_model <- multinom(fm ~ bmi_category , data = body_mass_read)
+body_mass_model_bmi <- multinom(bmi_category ~ gender + fm + bmr_kcal + muscle_mass_kg + fm_trunk, data = body_mass_read)
+body_mass_read$predicted_category <- predict(body_mass_model_bmi, newdata = body_mass_read)
+
+
+body_mass_model <- randomForest(fm ~ height + weight + gender * predicted_category + muscle_mass_kg, data = body_mass_read)
+
+
+# model 2 - final work being done here
+body_mass_read$predicted_fm <- predict(body_mass_model, newdata = body_mass_read)
+plot(body_mass_read$fm, body_mass_read$predicted_fm,
+     xlab = "Actual Fat Percentage",
+     ylab = "Estimated Fat Percentage",
+     main = "Estimated vs Actual Fat Percentage",
+     pch = 16, col = "blue")
+abline(a = 0, b = 1, col = "red", lty = 2) # Add a 1:1 reference line
+
 
 
 #### Save model ####
 saveRDS(
-  first_model,
-  file = "models/first_model.rds"
+  measurements_model,
+  file = "models/measurements_model.rds"
+)
+# BODY MASS
+#### Save model ####
+saveRDS(
+  body_mass_model,
+  file = "models/body_mass_model.rds"
+)
+
+saveRDS(
+  body_mass_model_bmi,
+  file = "models/body_mass_model_bmi.rds"
 )
 
 
