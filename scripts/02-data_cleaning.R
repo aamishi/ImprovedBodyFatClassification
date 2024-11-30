@@ -19,11 +19,40 @@ measurements_data <- read_parquet("data/raw_data/measurements_data.parquet")
 
 #### Clean data ####
 
+# Written with the help of ChatGPT with modifications
+# fat_categories with waist_hip_ratio as a proxy
+categorize_whr <- function(whr, sex) {
+  if (sex == 2) {
+    if (whr < 0.80) {
+      return("low")
+    } else if (whr >= 0.80 & whr < 0.85) {
+      return("moderate")
+    } else if (whr >= 0.85 & whr < 0.90) {
+      return("high")
+    } else {
+      return("extreme")
+    }
+  } else if (sex == 1) {
+    if (whr < 0.90) {
+      return("low")
+    } else if (whr >= 0.90 & whr < 0.95) {
+      return("moderate")
+    } else if (whr >= 0.95 & whr < 1.00) {
+      return("risk")
+    } else {
+      return("extreme")
+    }
+  } else {
+    return("Invalid sex")
+  }
+}
+
 # 1. MEASUREMENTS DATA (AWS - BodyM)
 combined_data <- merge(measurements_subject_data, measurements_data, by = "subject_id")
 
 cleaned_data <- combined_data %>%
   clean_names() %>%
+  mutate(gender = as.numeric(factor(combined_data$gender, levels = c("male", "female")))) %>%
   mutate(waist_hip_ratio = waist / hip) %>%
   mutate(height_hip_ratio = height_cm / hip) %>%
   mutate(original_bmi = weight_kg / (height_cm / 100)^2) %>%
@@ -33,21 +62,12 @@ cleaned_data <- combined_data %>%
     height = height_cm,  
     weight = weight_kg,           
     bmi = original_bmi                
-  )
+  ) %>%
+  select(subject_id, gender, height, weight, ankle, wrist, waist_hip_ratio, height_hip_ratio, bmi) %>%
+  mutate(fat_percentage_category = mapply(categorize_whr, waist_hip_ratio, gender))
+  
 
 cleaned_data$gender <- as.numeric(factor(combined_data$gender, levels = c("male", "female"))) 
-
-# Written with the help of ChatGPT with modifications
-# Create a placeholder column with 2018 rows
-cleaned_data$bmi_category <- factor(NA, levels = c("Underweight", "Normal", "Overweight", "Obese"))
-
-# Assign category based on original_bmi values
-cleaned_data$bmi_category <- ifelse(cleaned_data$bmi < 18.5, "Underweight",
-                                 ifelse(cleaned_data$bmi < 25, "Normal",
-                                        ifelse(cleaned_data$bmi < 30, "Overweight", "Obese")))
-
-# Ensure 'category' is a factor with the correct levels
-cleaned_data$bmi_category <- factor(cleaned_data$bmi_category, levels = c("Underweight", "Normal", "Overweight", "Obese"))
 
 
 #### Save data ####

@@ -29,13 +29,7 @@ library(dplyr)
 BMI is a common indicator for general health but it has its limitations. It does not take into consideration the actual body composition of an individual and other important factors such as sex and age. Through this paper, I would like to propose a new way categorising people based on other body measurements such as the waist-to-hip ratio and wrist and ankle circumferences measurements as they are more indicative of a person's visceral fat, this proving a more accurate representation of general health. I would like to propose a newer formula for General Health Index (GHI) through the BodyM dataset. I plan on using the Isaac Kuzmar dataset that has accurate measurements of body fat to create a Confusion Matrix to see how my model compares in providing more accurate body fat estimations through easlily measurable data such as waist and hip circumference.
 
 
-
-
-
-
-# Data {#sec-data}
-
-## Overview
+- this paper uses 2 datasets to capture the difference in fat assessment for popular methods. BMI is a popular way of estimating health issues in an individual but it fails to capture details like body composition. In its initial design, BMI was designed using only male [] subjects and thus cannot be applied to females. However, due to excess popularity, it is used as a self-assessment to estimate your body composition and health risks. However, due to its inability to capture body composition, a lot of false positives and false negatives are produced. These indivuals often identify health risks [] later in the onset. My aim with this paper is to introduce simple measurements that can be recorded at home and help indivuals recognise when they should seek mdeical attention.
 
 ## BMI Classification:
 ```{r}
@@ -53,6 +47,7 @@ knitr::kable(
   caption = "BMI Categories as per the Government of Canada Guidelines"
 )
 ```
+
 ### The difference between an underweight and normal person:
 Let us take a closer look at the BMI levels below 25 for underweight and normal weight adults.
 
@@ -122,6 +117,37 @@ ggplot(body_mass_clean, aes(x = bmi, y = fm)) +
 ```
 
 
+
+A new way of estimating general body health is to use WHR. This ratio aims to capture the excess fat deposit in a person's abdominal area which is were most people store adipose fat. A high WHR indicates high levels of fat. However, this is not enough. This is simply the most effective way of identyfing the most obvious and dangerous place of fat accumulation.
+
+
+
+
+# Data {#sec-data}
+
+## Overview
+
+### Body Composition Data - Isaac Kuzmar Et Al.
+#### talk about this data
+#### how was it collected
+#### what is collected
+#### graph what i will be using in my model
+
+### Measurements Data - BodyM - AWS.
+#### talk about this data
+#### how was it collected
+#### what is collected
+#### graph what i will be using in my model
+
+## what original BMI and WHR fail to capture
+
+
+## How are these data sets important are how they relate to each other
+#### desitination
+#### well as any relationships between the variables.
+
+
+
 Overview text
 
 ## Measurement
@@ -180,6 +206,8 @@ We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use
 
 
 ### Model justification
+- I wanted to provide a categorisation of fat levels in an indivual based on simple measurements. Using measurements such as height and weight that are used in the formula and WHR and ankle and wrist measurements, I wanted to capture a person's body compositon as much as possible. i expected that there is a positve relationship between a person's excess body fat levels and their WHR. In addition to WHR, the height if a person is also important to capture the distribution of fat, a short person with a high WHR would be at a higher risk of obesity related diseases.
+- men are more likely to collect fat in their abdomen area and women in their hip area. To capture nature body shapes and leanness, i also considered....
 
 We expect a positive relationship between the size of the wings and time spent aloft. In particular...
 
@@ -214,8 +242,7 @@ Our results are summarized in @tbl-modelresults.
 
 ## First discussion point {#sec-first-point}
 
-If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this. 
-
+- height is not all, personality is more important
 ## Second discussion point
 
 Please don't use these as sub-heading labels - change them to be what your point actually is.
@@ -223,6 +250,7 @@ Please don't use these as sub-heading labels - change them to be what your point
 ## Third discussion point
 
 ## Weaknesses and next steps
+- the BodyM dataset does not include age. An older person has lower metabolism [] and a higher chance of collecting fat on their abdomen.
 
 Weaknesses and next steps should also be included.
 
