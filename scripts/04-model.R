@@ -26,44 +26,58 @@ measurements_model <- multinom(fat_percentage_category ~ height + gender + waist
 # Summary of the model
 summary(measurements_model)
 
+cleaned_data_model$predicted_category <- predict(measurements_model, newdata = cleaned_data_model)
+
+
 
 #### Read data ####
 # body_mass_model <- multinom(fm ~ bmi_category , data = body_mass_read)
-body_mass_model_bmi <- multinom(fat_percentage_category ~ gender + fm + bmr_kcal + muscle_mass_kg + fm_trunk, data = body_mass_model)
+body_mass_model_bmi <- multinom(fat_percentage_category ~ height + gender + fm, data = body_mass_model)
+summary(body_mass_model_bmi)
 body_mass_model$predicted_category <- predict(body_mass_model_bmi, newdata = body_mass_model)
 
 
 # body_mass_model <- randomForest(fm ~ height + weight + gender * predicted_category + muscle_mass_kg, data = body_mass_read)
 
-data_long <- body_mass_model %>%
-  pivot_longer(cols = c(fat_percentage_category, predicted_category),
-               names_to = "BMI_Category_Type", values_to = "BMI_Category")
+##### FOR THE MODEL's RESULTS SECTION:
+measurements_results <- cleaned_data_model %>%
+  select(gender, height, weight, height_category, fat_percentage_category, predicted_category) %>%
+  mutate(source = "measurements")
 
-# Boxplot - i like 
-ggplot(data_long, aes(x = BMI_Category, y = fm, fill = BMI_Category_Type)) +
-  geom_boxplot(position = position_dodge(0.8), alpha = 0.7) +
-  labs(title = "Fat Mass Percentage by BMI Category", 
-       x = "BMI Category", y = "Fat Mass Percentage (%)") +
-  theme_minimal()
+body_composition_results <- body_mass_model %>%
+  select(gender, height, weight, height_category, fat_percentage_category, predicted_category) %>%
+  mutate(source = "body_composition")
 
-ggplot(data_long, aes(x = fm, fill = BMI_Category_Type)) +
+elongated_data <- bind_rows(measurements_results, body_composition_results)
+
+# View the resulting data
+head(elongated_data)
+
+ggplot(elongated_data, aes(x = fat_percentage_category, fill = source)) +
+  geom_bar(position = "fill") +  # Normalize counts to proportions
+  labs(title = "Normalized Bar Plot of Fat Percentage Category vs Predicted Category (Source Highlighted)",
+       x = "Fat Percentage Category",
+       y = "Proportion",  # Update y-axis label to reflect proportions
+       fill = "Source") +
+  facet_wrap(~ height_category) +  # Facet by gender
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for readability
+
+ggplot(elongated_data, aes(x = predicted_category, fill = source)) +
   geom_density(alpha = 0.5) +
-  facet_wrap(~BMI_Category, scales = "free") +
-  labs(title = "Fat Mass Distribution by BMI Category", 
-       x = "Fat Mass Percentage (%)", y = "Density") +
+  facet_wrap(~ predicted_category) +
+  labs(title = "Density Plot of Predicted Categories by Source",
+       x = "Predicted Category",
+       y = "Density",
+       fill = "Source") +
   theme_minimal()
+
 
 #### Save model ####
 saveRDS(
   measurements_model,
   file = "models/measurements_model.rds"
 )
-# BODY MASS
-#### Save model ####
-# saveRDS(
-#   body_mass_model,
-#   file = "models/body_mass_model.rds"
-# )
 
 saveRDS(
   body_mass_model_bmi,

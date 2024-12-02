@@ -35,6 +35,7 @@ BMI is a common indicator for general health but it has its limitations. It does
 ```{r}
 #| warning: false
 #| message: false
+#| echo: false
 bmi_canada_gov <- data.frame(
   Category = c("Underweight", "Normal weight", "Overweight", "Obese - Class I", "Obese - Class II", "Obese - Class III"),
   `BMI Range` = c("Below 18.5", "18.5–24.9", "25.0–29.9", "30.0–34.9", "35.0–39.9", "40.0 and above")
@@ -54,6 +55,7 @@ Let us take a closer look at the BMI levels below 25 for underweight and normal 
 ```{r}
 #| warning: false
 #| message: false
+#| echo: false
 body_mass_data_raw <- read_parquet("../data/raw_data/body_mass_data.parquet")
 body_mass_clean <- body_mass_data_raw %>%
   clean_names() %>%
@@ -86,6 +88,10 @@ ggplot(bmi_under_25, aes(x = bmi, y = fm)) +
 
 ### The difference between a normal and overweight person:
 ```{r}
+#| warning: false
+#| message: false
+#| echo: false
+
 bmi_normal_over <- body_mass_clean %>%
   filter(18.5 < bmi & bmi < 30)
 
@@ -103,6 +109,10 @@ ggplot(bmi_normal_over, aes(x = bmi, y = fm)) +
 
 ### All categories
 ```{r}
+#| warning: false
+#| message: false
+#| echo: false
+
 # this is what i chose
 ggplot(body_mass_clean, aes(x = bmi, y = fm)) +
   geom_point(aes(color = bmi_category), alpha = 0.7) +
@@ -126,18 +136,43 @@ A new way of estimating general body health is to use WHR. This ratio aims to ca
 # Data {#sec-data}
 
 ## Overview
+#### General Statement
+- [is this data observational or sample] The data used for this paper has two different sources and serve two different purpose. The first dataset considered is the BodyM dataset from Amazon Web Services (AWS) [ref]. This dataset serves as the training data for the model to predict the category of fat in a person. This dataset also included silhouettes to capture accurate body compositions of real test subjects. [the purpose of this]. This data was collected to support the estimation of bodily measurements using Machine Learning [reference]. The silhouettes are not being used for the purposes of this paper.
+- [is this data observational or sample] The second dataset is the Body Fat Distribution distribution collected for estimating a new body fat measurement technique by Isaac Kuzmar Et Al. [reference]. For the purposes of this paper, this dataset would be refered to as the Body Compositon dataset as it used to calculate fat percentages based on actual body composition. It serves as a comparision for the model’s predictions.
+
+### BodyM Dataset - AWS Marketplace for Open Data [fix this heading]
+The BodyM Dataset, refered to teh Body Measurements dataset throughout this paper, was collected for [Ruiz2022] Ruiz Et Al. in their paper with a focus on underrepresented body types in estimation of fat and its susbquent health risks. The main data captured from this collection was the front and lateral silhouttes of [2000something] test subjects. These silhouttes were then converted to black and white images to be used by their augementation model. The subjects include X male and Y female aged A to B. The body measurements in this dataset were generated through their adversarial body simulator (ABS). The ABS was specifically modeled to capture underrespresented body types. The S3 [reference] package included 3 datasets: training, Test A and Test B. This paper uses the training dataset. The visual images of test subjects were photographed and 3D-scanned by lab technicians.
+- Tibble of this dataset after cleaning:
+
+#### The variables of my use:
+
+For this paper, this dataset is used to estimate the category of body fat that a person carries. To effectively differentiate the different body types, the model considers measurements that could indicate actual body compositions. I chose gender, height and weight and basic predictors for the model. However, according to [reference, WHO], waist-to-hip ratio is more accurate to predict levels of body fat in a person. Based on [reference], the two sexes have different tendencies of excess body fat collection also known as [adipose fat]. In males, excess body fat tends to collect in the abdominal region, whereas in females, fat collects in the hips. This ratio is indicative of fat accumulation and a higher ratio can be used as a precursor indicator for obesity [reference]. 
+
+To consider body composition along the height of a person, a new variable called height-to-hip ratio, height_hip_ratio, was created. [referernce], something like two people with the same WHR could differ in the fat category that they belong to depending on the height. A tall person with a higher WHR is at a lower risk of developing cardiovascular risks than a shorter person with the same height [reference].
+
+Lastly, to improve the quality of the model, I also selected ankle and wrist circumference measurements. [reference], [this is important for boundary values].
+
+- include a table for WHR and who’s statement
+
+#### The estimand for the model
+
+The estimand for the model, fat_percentage_category, is created using WHR as a proxy initially. It is calculated based on the subjects gender and WHR as males and females have different fat accumulation patters. The ratio intervels for these categories was derived from []. The model then predicts a more accurate fat percentage category based on other predictors.
+
+- visualisations.
+
+#### graph what i will be using in my model
 
 ### Body Composition Data - Isaac Kuzmar Et Al.
-#### talk about this data
-#### how was it collected
-#### what is collected
+### Data Overview
+
+The dataset compiles the body measurements of subjects aged, 18 and 60, and specifically with a desire to lose weight and improve body image. The participants resided in Barranquilla, Colombia and consisted of 234 males and 111 females. Medical exclusions were made while recruiting the subjects, such as pregnant women or people with medical pacemakers. The bodily measurements such as fat mass in kilograms and fat free mas in kilograms were determined using the Tanita MC-780 [reference] body composition analyzer. 
+
+### The variables of my use:
+
+The main variables that I considered fat mass percentage fm. This variable is obtained by dividing the fat mass in kilogram by the total weight in kilograms. The fat mass percentage is considered the main predictor for fat mass categories. As the body composition is more accuarate at measuring the actual amount of excess fat a person carries and can differentiate it from other weights such as fat free muscle mass [reference the variable]
 #### graph what i will be using in my model
 
-### Measurements Data - BodyM - AWS.
-#### talk about this data
-#### how was it collected
-#### what is collected
-#### graph what i will be using in my model
+
 
 ## what original BMI and WHR fail to capture
 
@@ -156,8 +191,8 @@ Some paragraphs about how we go from a phenomena in the world to an entry in the
 
 
 ```{r}
-#| label: fig-bills
-#| fig-cap: Bills of penguins
+#| warning: false
+#| message: false
 #| echo: false
 ```
 
@@ -165,7 +200,9 @@ Talk more about it.
 
 
 ```{r}
-
+#| warning: false
+#| message: false
+#| echo: false
 ```
 
 Talk way more about it. 
@@ -189,6 +226,8 @@ The goal of our modelling strategy is twofold. Firstly,...
 
 Here we briefly describe the Bayesian analysis model used to investigate... Background details and diagnostics are included in [Appendix -@sec-model-details].
 
+- multinomial logistic regression because we are predicting multiple categories
+
 ## Model set-up
 
 Define $y_i$ as the number of seconds that the plane remained aloft. Then $\beta_i$ is the wing width and $\gamma_i$ is the wing length, both measured in millimeters.  
@@ -209,20 +248,121 @@ We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use
 - I wanted to provide a categorisation of fat levels in an indivual based on simple measurements. Using measurements such as height and weight that are used in the formula and WHR and ankle and wrist measurements, I wanted to capture a person's body compositon as much as possible. i expected that there is a positve relationship between a person's excess body fat levels and their WHR. In addition to WHR, the height if a person is also important to capture the distribution of fat, a short person with a high WHR would be at a higher risk of obesity related diseases.
 - men are more likely to collect fat in their abdomen area and women in their hip area. To capture nature body shapes and leanness, i also considered....
 
-We expect a positive relationship between the size of the wings and time spent aloft. In particular...
+## Model General Overview:
 
-We can use maths by including latex between dollar signs, for instance $\theta$.
+This paper uses 2 models to model the two datasets. The first model, the Body Measurements Model, would be used to predict fat percetage categories using the measurements of person’s body that can be obtained using a measuring tape. The second model, the Body Composition Model, is also designed to access the relation between different bodiliy compositions such as total body weight, excess fat weight, lean muscle mass in kilograms.
+
+I used the packages [] to do []. Both models employ Multilevel Regression [] as the Fat Percentage Category has multiple categories including: essential, athlete, normal, high.
+
+### Model 1:
+
+In this model, the dependent variable is fat_percentage_category. The model is set up as follows
+
+\begin{align}
+\text{log}\left(\frac{P(y = j)}{P(y = \text{ref})}\right) = \beta_{0j} + \beta_{1j} \cdot \text{height} + \beta_{2j} \cdot \text{gender} + \beta_{3j} \cdot \text{waist\_hip\_ratio} + \beta_{4j} \cdot \text{height\_hip\_ratio}
+\end{align}
+
+Where:
+- \( y \) is the **fat percentage category** (e.g., categories like 'low', 'medium', 'high').
+- \( P(y = j) \) is the probability that the fat percentage falls into category \( j \).
+- \( P(y = \text{ref}) \) is the reference category.
+- \( \beta_{0j}, \beta_{1j}, \dots \) are the coefficients to be estimated for each category \( j \).
+
+
+### Model Justification
+
+It is incredibily challenging to differentiate the body composition of a person based soley on their total weight, height and weight only. However, to increase the [goodness] of the classification, this model uses the waist_to_hip ratio, which is especially an important indicator for fat accumualtion across both genders. The model also uses height_hip_ratio to account for different body types. [this sentence might go in the datasection] As height is an important factor to evaluate the collection of fat in latitdunial(how tf do you spell it) places on a person’s body, this is an important factor to consider. However, using height simply does not effectvely communicate how a person’s body is composed latitudinally. So I chose to employ the height_hip_ratio ratio to provide more classification between body types. Additional features such and ankle and wrist are used to further differentiate between the categories.
+
+### Assumptions and limitations
+
+Assumptions:
+- this model assumes that there is an obvious difference in body measurements and fat storing capacities in males and females, hence gender is an important predictor and also affects the proxy values of fat percentage owing to the calculation based on WHR.
+
+Limitations: 
+
+- The dataset does not include the age of the particapants. while a general age range is provided, such as 18-X years old, different age groups could differ in how they are categorised.
+- This model would not be able to differentiate between age groups and hence would work poorly if this information is included.
+- 
+
+### Model validation
+
+---
+
+### Model 2:
+
+In this model, the dependent variable is fat_percentage_category. The model is set up as follows
+
+- fat_percentage_category = beta_0 + beta_1() + beta_() + beta_() + beta_()
+
+where
+
+- fatmass:
+- weight:
+- height_hip_ratio
+
+### Model Justification
+
+### Assumptions and limitations
+
+Assumptions:
+- this model assumes that there is an obvious difference in body measurements and fat storing capacities in males and females, hence gender is an important predictor and also affects the proxy values of fat percentage owing to the calculation based on WHR.
+
+Limitations: 
+
+- The dataset does not include the age of the particapants. while a general age range is provided, such as 18-X years old, different age groups could differ in how they are categorised.
+- This model would not be able to differentiate between age groups and hence would work poorly if this information is included.
+- This model is also built on data that was generated by the ABS [] simulator so it may be inherently working with an error.
+
+### Model validation:
+
+Model out-of-sample testing:
+
+The dataset provided by BodyM already had a trainining and testing split. I used the Test A to test the accuracy of the model. As the method of collection was similar to the training data, the potential errors in the model could only arise from the fact that it is unseen data.
+
+More elaboare explanation, tables and figures can be found at [].
+
+RSME:
+I also computed the RSME to evaluate the model’s performance as a lower RSME indicates accuracy in predicted vs actual fat percentage categories.
 
 
 # Results
 
-Our results are summarized in @tbl-modelresults.
+Our results are summarized in @tbl-modelresults. Our model's results and interpretation:
 
 ```{r}
 #| echo: false
 #| eval: true
 #| warning: false
 #| message: false
+
+library(caret)
+
+# Ensure actual categories are factors
+# actual_categories <- factor(cleaned_data_model$fat_percentage_category, 
+#                             levels = c("high", "low", "moderate", "risk"))
+# 
+# # Ensure predicted categories are factors
+# predicted_categories <- factor(predict(measurements_model, newdata = cleaned_data_model, type = "class"),
+#                                 levels = c("high", "low", "moderate", "risk"))
+# 
+# # Now create the confusion matrix
+# 
+# 
+# 
+# conf_matrix <- confusionMatrix(predicted_categories, actual_categories)
+# print(conf_matrix)
+# accuracy <- mean(predicted_categories == actual_categories)
+# print(accuracy)
+# 
+# library(pROC)
+# 
+# probabilities <- predict(measurements_model, newdata = cleaned_data_model, type = "probs")
+# 
+# # Convert true categories to a binary format for ROC computation (one-vs-all approach)
+# roc_result <- multiclass.roc(actual_categories, probabilities)
+# 
+# # Plot ROC curve
+# plot(roc_result)
 
 ```
 
