@@ -21,6 +21,12 @@ library(tidyverse)
 library(janitor)
 library(arrow)
 library(dplyr)
+library(caret)
+library(knitr)
+
+# reading the final datasets:
+cleaned_data_model <- read_parquet(file = here::here("data/analysis_data/measurements_analysis_data.parquet"))
+body_mass_model <- read_parquet(file = here::here("data/analysis_data/body_mass_data.parquet"))
 ```
 
 
@@ -69,43 +75,8 @@ body_mass_clean <- body_mass_data_raw %>%
       bmi >= 35.0 & bmi <= 39.9 ~ "Obese - Class II",
       bmi >= 40.0 ~ "Obese - Class III"
     ))
-
-# Data Section: Part 1: What is the difference between an underweight / athletic person / normal person:
-bmi_under_25 <- body_mass_clean %>%
-  filter(bmi < 25)
-
-ggplot(bmi_under_25, aes(x = bmi, y = fm)) +
-  geom_point(aes(color = bmi_category), alpha = 0.7) +
-  labs(
-    title = "BMI vs. Fat Mass by BMI Category",
-    x = "BMI",
-    y = "Fat Mass (kg)",
-    color = "BMI Category"
-  ) +
-  theme_minimal()
-
 ```
-
-### The difference between a normal and overweight person:
-```{r}
-#| warning: false
-#| message: false
-#| echo: false
-
-bmi_normal_over <- body_mass_clean %>%
-  filter(18.5 < bmi & bmi < 30)
-
-# this is what i chose
-ggplot(bmi_normal_over, aes(x = bmi, y = fm)) +
-  geom_point(aes(color = bmi_category), alpha = 0.7) +
-  labs(
-    title = "BMI vs. Fat Mass by BMI Category",
-    x = "BMI",
-    y = "Fat Mass (kg)",
-    color = "BMI Category"
-  ) +
-  theme_minimal()
-```
+# Data Section: Part 1: What is the difference between an underweight / athletic person / 
 
 ### All categories
 ```{r}
@@ -114,7 +85,7 @@ ggplot(bmi_normal_over, aes(x = bmi, y = fm)) +
 #| echo: false
 
 # this is what i chose
-ggplot(body_mass_clean, aes(x = bmi, y = fm)) +
+ggplot(body_mass_model, aes(x = bmi, y = fm)) +
   geom_point(aes(color = bmi_category), alpha = 0.7) +
   geom_vline(xintercept = c(18.5, 25, 30), linetype = "dashed", color = "black", linewidth = 0.5, alpha = 0.5) +
   labs(
@@ -144,6 +115,12 @@ A new way of estimating general body health is to use WHR. This ratio aims to ca
 The BodyM Dataset, refered to teh Body Measurements dataset throughout this paper, was collected for [Ruiz2022] Ruiz Et Al. in their paper with a focus on underrepresented body types in estimation of fat and its susbquent health risks. The main data captured from this collection was the front and lateral silhouttes of [2000something] test subjects. These silhouttes were then converted to black and white images to be used by their augementation model. The subjects include X male and Y female aged A to B. The body measurements in this dataset were generated through their adversarial body simulator (ABS). The ABS was specifically modeled to capture underrespresented body types. The S3 [reference] package included 3 datasets: training, Test A and Test B. This paper uses the training dataset. The visual images of test subjects were photographed and 3D-scanned by lab technicians.
 - Tibble of this dataset after cleaning:
 
+```{r}
+# measurements_tibble <- as_tibble(cleaned_data_model)
+# kable(measurements_tibble, caption = "Example Tibble Output")
+```
+
+
 #### The variables of my use:
 
 For this paper, this dataset is used to estimate the category of body fat that a person carries. To effectively differentiate the different body types, the model considers measurements that could indicate actual body compositions. I chose gender, height and weight and basic predictors for the model. However, according to [reference, WHO], waist-to-hip ratio is more accurate to predict levels of body fat in a person. Based on [reference], the two sexes have different tendencies of excess body fat collection also known as [adipose fat]. In males, excess body fat tends to collect in the abdominal region, whereas in females, fat collects in the hips. This ratio is indicative of fat accumulation and a higher ratio can be used as a precursor indicator for obesity [reference]. 
@@ -160,6 +137,85 @@ The estimand for the model, fat_percentage_category, is created using WHR as a p
 
 - visualisations.
 
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+
+cleaned_data_model$bmi_category <- factor(cleaned_data_model$bmi_category, 
+                            levels = c("Underweight", "Normal", "Overweight", "Obese"))
+ggplot(cleaned_data_model, aes(x = gender, fill = bmi_category)) +
+  geom_bar(position = "fill") +  # 'fill' makes it a proportion plot
+  ylab("Proportion") +
+  xlab("Gender") +
+  labs(title = "Proportions of BMI Categories by Gender") +
+  scale_y_continuous(labels = scales::percent) +  # Converts y-axis to percentage format
+  theme_minimal()
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+cleaned_data_model$gender <- factor(cleaned_data_model$gender, labels = c("Female", "Male"))
+ggplot(cleaned_data_model, aes(x = gender, y = waist_hip_ratio, fill = gender)) +
+  geom_boxplot() +
+  ylab("Waist-to-Hip Ratio") +
+  xlab("Gender") +
+  labs(title = "Distribution of Waist-to-Hip Ratio by Gender") +
+  theme_minimal() +
+  facet_wrap(~fat_percentage_category) + 
+  scale_fill_manual(values = c("female" = "lightblue", "male" = "lightgreen"))
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+cleaned_data_model$gender <- factor(cleaned_data_model$gender, labels = c("Female", "Male"))
+
+cleaned_data_model$bmi_category <- factor(cleaned_data_model$bmi_category, 
+                            levels = c("Underweight", "Normal", "Overweight", "Obese"))
+ggplot(cleaned_data_model, aes(x = gender, y = height_hip_ratio, fill = gender)) +
+  geom_boxplot() +
+  ylab("Waist-to-Hip Ratio") +
+  xlab("Gender") +
+  labs(title = "Distribution of Waist-to-Hip Ratio by Gender") +
+  theme_minimal() +
+  facet_wrap(~bmi_category) + 
+  scale_fill_manual(values = c("female" = "lightblue", "male" = "lightgreen"))
+```
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+# filtered_data <- subset(cleaned_data_model, bmi_category %in% c("Overweight", "Obese"))
+
+# Create a combined boxplot to visualize differences in ankle and wrist for bmi_category = Overweight and Obese
+
+cleaned_data_model$bmi_category <- factor(cleaned_data_model$bmi_category, 
+                            levels = c("Underweight", "Normal", "Overweight", "Obese"))
+
+long_data <- cleaned_data_model %>%
+  gather(key = "Measurement", value = "Value", ankle, wrist)
+
+# Create side-by-side boxplots for ankle and wrist measurements
+ggplot(long_data, aes(x = bmi_category, y = Value, fill = bmi_category)) +
+  geom_boxplot() +
+  facet_wrap(~ Measurement) +  # This creates separate panels for 'ankle' and 'wrist'
+  ylab("Measurement Value") +
+  xlab("BMI Category") +
+  labs(title = "Comparison of Ankle and Wrist Measurements for Overweight and Obese BMI Categories") +
+  theme_minimal() +
+  scale_fill_manual(values = c("Overweight" = "lightcoral", "Obese" = "lightsalmon")) +
+  theme(legend.position = "none")
+```
+
+
 #### graph what i will be using in my model
 
 ### Body Composition Data - Isaac Kuzmar Et Al.
@@ -172,7 +228,95 @@ The dataset compiles the body measurements of subjects aged, 18 and 60, and spec
 The main variables that I considered fat mass percentage fm. This variable is obtained by dividing the fat mass in kilogram by the total weight in kilograms. The fat mass percentage is considered the main predictor for fat mass categories. As the body composition is more accuarate at measuring the actual amount of excess fat a person carries and can differentiate it from other weights such as fat free muscle mass [reference the variable]
 #### graph what i will be using in my model
 
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+# Recode gender levels
+body_mass_model %>%
+  mutate(gender = factor(gender, levels = c(1, 2), labels = c("Male", "Female"))) %>%
+  mutate(fat_percentage_category = factor(fat_percentage_category,
+                                          levels = c("Low", "Moderate", "High", "Extreme"))) %>%
+  mutate(
+    gender = as.factor(gender),
+    fat_percentage_category = as.factor(fat_percentage_category)
+  )
+  
+ggplot(body_mass_model, aes(x = gender, fill = fat_percentage_category)) +
+  geom_bar(position = "fill") +  # 'fill' makes it a proportion plot
+  ylab("Proportion") +
+  xlab("Gender") +
+  labs(title = "Proportions of BMI Categories by Gender") +
+  scale_y_continuous(labels = scales::percent) +  # Converts y-axis to percentage format
+  theme_minimal()
+```
 
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+ggplot(body_mass_model, aes(x = weight, y = height, color = fm)) +
+  geom_point(size = 3) +
+  scale_color_viridis_c() + # Use a continuous color scale
+  labs(title = "Height vs Weight with Fat Mass",
+       x = "Weight",
+       y = "Height",
+       color = "Fat Mass (fm)") +
+  theme_minimal()
+```
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+ggplot(body_mass_model, aes(x = weight, y = height, color = fm, size = fm)) +
+  geom_point(alpha = 0.7) +
+  scale_color_viridis_c() +
+  scale_size_continuous(range = c(1, 10)) +
+  labs(title = "Height vs Weight with Fat Mass",
+       x = "Weight",
+       y = "Height",
+       color = "Fat Mass (fm)",
+       size = "Fat Mass (fm)") +
+  theme_minimal()
+```
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+ggplot(body_mass_model, aes(x = bmi, y = fm, color = gender)) +
+  geom_point(alpha = 0.7) +
+  facet_wrap(~ gender) +
+  labs(title = "Fat Mass vs BMI by Gender",
+       x = "BMI",
+       y = "Fat Mass (fm)",
+       color = "Gender") +
+  theme_minimal()
+```
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+body_mass_long <- body_mass_model %>%
+  pivot_longer(cols = c(fm, bmi), names_to = "measure", values_to = "value")
+
+# Dual y-axis plot
+ggplot(body_mass_long, aes(x = weight, y = value, color = measure)) +
+  geom_point(alpha = 0.5) + # Optional: Add points for raw data
+  geom_smooth(se = FALSE, method = "loess", span = 0.5) + # Smoothed trendline
+  labs(title = "Smoothed Trends of FM and BMI by Age",
+       x = "weight",
+       y = "Value",
+       color = "Measure") +
+  theme_minimal() +
+  facet_wrap(~gender)
+
+```
+- talk about the crowding for men
 
 ## what original BMI and WHR fail to capture
 
@@ -181,6 +325,51 @@ The main variables that I considered fat mass percentage fm. This variable is ob
 #### desitination
 #### well as any relationships between the variables.
 
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+# Combine both datasets
+cleaned_test_extract <- cleaned_data_model %>%
+  select(gender, bmi_category, fat_percentage_category)
+body_mass_extracted <- body_mass_model %>%
+  select(gender, bmi_category, fat_percentage_category)
+cleaned_test_extract$dataset <- "Measurements"
+body_mass_extracted$dataset <- "Body Data"
+combined_data <- rbind(cleaned_test_extract, body_mass_extracted)
+
+
+# Count occurrences of each fat_percentage_category per dataset
+library(dplyr)
+category_counts <- combined_data %>%
+  group_by(dataset, fat_percentage_category) %>%
+  summarise(Count = n(), .groups = "drop")
+
+# Create a bar plot to visualize the differences
+library(ggplot2)
+ggplot(category_counts, aes(x = fat_percentage_category, y = Count, fill = dataset)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Comparison of Fat Percentage Categories Across Data1 and Data2",
+       x = "Fat Percentage Category", y = "Count") +
+  theme_minimal() +
+  scale_fill_manual(values = c("Measurements" = "lightblue", "Body Data" = "lightgreen"))
+
+
+proportions <- combined_data %>%
+  group_by(dataset, fat_percentage_category) %>%
+  summarise(Count = n(), .groups = "drop") %>%
+  mutate(Proportion = Count / sum(Count))
+
+# Create a bar plot to visualize the proportions
+ggplot(proportions, aes(x = fat_percentage_category, y = Proportion, fill = dataset)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Proportional Comparison of Fat Percentage Categories Across Data1 and Data2",
+       x = "Fat Percentage Category", y = "Proportion") +
+  scale_y_continuous(labels = scales::percent) +  # Show proportions as percentages
+  theme_minimal() +
+  scale_fill_manual(values = c("Measurements" = "lightblue", "Body Data" = "lightgreen"))
+```
 
 
 Overview text
@@ -262,11 +451,20 @@ In this model, the dependent variable is fat_percentage_category. The model is s
 \text{log}\left(\frac{P(y = j)}{P(y = \text{ref})}\right) = \beta_{0j} + \beta_{1j} \cdot \text{height} + \beta_{2j} \cdot \text{gender} + \beta_{3j} \cdot \text{waist\_hip\_ratio} + \beta_{4j} \cdot \text{height\_hip\_ratio}
 \end{align}
 
+<!-- Where: -->
+<!-- \begin{align} -->
+<!-- - \( y \) is the **fat percentage category** (e.g., categories like 'low', 'medium', 'high'). -->
+<!-- - \( P(y = j) \) is the probability that the fat percentage falls into category \( j \). -->
+<!-- - \( P(y = \text{ref}) \) is the reference category. -->
+<!-- - \( \beta_{0j}, \beta_{1j}, \dots \) are the coefficients to be estimated for each category \( j \). -->
+<!-- \end{align} -->
+
 Where:
-- \( y \) is the **fat percentage category** (e.g., categories like 'low', 'medium', 'high').
+- \( y \) is the **fat percentage category**. The categories include low, moderate, high, and extreme. These equate low, moderate, high and extreme levels of body fat.
 - \( P(y = j) \) is the probability that the fat percentage falls into category \( j \).
 - \( P(y = \text{ref}) \) is the reference category.
 - \( \beta_{0j}, \beta_{1j}, \dots \) are the coefficients to be estimated for each category \( j \).
+
 
 
 ### Model Justification
@@ -326,55 +524,49 @@ I also computed the RSME to evaluate the model’s performance as a lower RSME i
 
 
 # Results
+## Model Results for Measurements Model
 
-Our results are summarized in @tbl-modelresults. Our model's results and interpretation:
+Our results are summarized in @tbl-measurementmodelresults. Our model's results and interpretation:
 
 ```{r}
 #| echo: false
 #| eval: true
 #| warning: false
 #| message: false
+#| label: tbl-measurementmodelresults
+#| tbl-cap: "TODO"
 
-library(caret)
 
-# Ensure actual categories are factors
-# actual_categories <- factor(cleaned_data_model$fat_percentage_category, 
-#                             levels = c("high", "low", "moderate", "risk"))
-# 
-# # Ensure predicted categories are factors
-# predicted_categories <- factor(predict(measurements_model, newdata = cleaned_data_model, type = "class"),
-#                                 levels = c("high", "low", "moderate", "risk"))
-# 
-# # Now create the confusion matrix
-# 
-# 
-# 
-# conf_matrix <- confusionMatrix(predicted_categories, actual_categories)
-# print(conf_matrix)
-# accuracy <- mean(predicted_categories == actual_categories)
-# print(accuracy)
-# 
-# library(pROC)
-# 
-# probabilities <- predict(measurements_model, newdata = cleaned_data_model, type = "probs")
-# 
-# # Convert true categories to a binary format for ROC computation (one-vs-all approach)
-# roc_result <- multiclass.roc(actual_categories, probabilities)
-# 
-# # Plot ROC curve
-# plot(roc_result)
+# # Code chunk to import models
+measurements_model_paper <- readRDS(file = here::here("models/measurements_model.rds"))
+measurements_model_summary <- summary(measurements_model_paper)
+measurements_summary_df <- as.data.frame(measurements_model_summary$coefficients)
 
+# Create and style the table
+kable(measurements_summary_df, caption = "Summary of Measurements Model")
 ```
+
+## Model Results for Body Mass Model
+
+Our results are summarized in @tbl-bodymass-modelresults. Our model's results and interpretation:
 
 ```{r}
 #| echo: false
 #| eval: true
-#| label: tbl-modelresults
-#| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
 #| warning: false
+#| message: false
+#| label: tbl-bodymass-modelresults
+#| tbl-cap: "TODO"
 
+
+# # Code chunk to import models
+body_mass_model_paper <- readRDS(file = here::here("models/body_mass_model_bmi.rds"))
+body_mass_model_summary <- summary(body_mass_model_paper)
+body_mass_summary_df <- as.data.frame(body_mass_model_summary$coefficients)
+
+# Create and style the table
+kable(body_mass_summary_df, caption = "Summary of Measurements Model")
 ```
-
 
 
 
@@ -387,9 +579,11 @@ library(caret)
 
 Please don't use these as sub-heading labels - change them to be what your point actually is.
 
-## Third discussion point
+## Second discussion point {#sec-second-point}
 
-## Weaknesses and next steps
+## Third discussion point {#sec-third-point}
+
+## Weaknesses and next steps {#sec-weaknesses-point}
 - the BodyM dataset does not include age. An older person has lower metabolism [] and a higher chance of collecting fat on their abdomen.
 
 Weaknesses and next steps should also be included.
@@ -414,6 +608,23 @@ we compare the posterior with the prior. This shows...
 #| echo: false
 #| message: false
 #| warning: false
+
+# predictions <- as.factor(predict(measurements_model_paper, newdata = cleaned_data_model))
+# reference <- as.factor(cleaned_data_model$fat_percentage_category)
+# measurements_cm <- confusionMatrix(predictions, cleaned_data_model$fat_percentage_category)
+# # Extract the confusion matrix
+# measurements_conf_matrix <- as.data.frame(measurements_cm$table)
+# measurements_conf_matrix_df <- as.data.frame(measurements_conf_matrix)
+# rownames(measurements_conf_matrix_df) <- paste("Observed:", rownames(measurements_conf_matrix))
+# colnames(measurements_conf_matrix_df) <- paste("Predicted:", colnames(measurements_conf_matrix))
+# kable(measurements_conf_matrix_df, caption = "Confusion Matrix")
+# 
+# # Extract overall statistics
+# overall_stats <- as.data.frame(t(measurements_cm$overall))
+# kable(overall_stats, caption = "Overall Statistics")
+# 
+# residuals <- residuals(measurements_model_paper, type = "deviance")
+# plot(residuals)
 ```
 
 

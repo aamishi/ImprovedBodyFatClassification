@@ -72,6 +72,25 @@ ggplot(elongated_data, aes(x = predicted_category, fill = source)) +
        fill = "Source") +
   theme_minimal()
 
+# Normalize the data to get proportions for each fat_percentage_category and predicted_category within each height_category
+heatmap_data <- elongated_data %>%
+  count(fat_percentage_category, predicted_category, source, height_category) %>%
+  group_by(height_category, fat_percentage_category) %>%
+  mutate(proportion = n / sum(n))  # Normalize by height_category and fat_percentage_category
+
+# Create the heatmap with normalized proportions and faceting by height_category
+ggplot(heatmap_data, aes(x = fat_percentage_category, y = predicted_category, fill = proportion)) +
+  geom_tile() +  # Create heatmap tiles
+  scale_fill_gradient(low = "white", high = "blue") +  # Color scale for proportions
+  labs(title = "Normalized Heatmap of Fat Percentage Category vs Predicted Category (Source Highlighted)",
+       x = "Fat Percentage Category",
+       y = "Predicted Category",
+       fill = "Proportion") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for readability
+
+
+
 
 #### Save model ####
 saveRDS(
