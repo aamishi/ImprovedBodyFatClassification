@@ -1,3 +1,12 @@
+#### Preamble ####
+# Purpose: EDA
+# Author: Aamishi Avarsekar
+# Date: 3rd December 2024
+# Contact: aamishi.avarsekar@mail.utoronto.ca
+# License: MIT
+# Note: this code may not work and is simply my eda work
+
+
 # Work space setup
 library(tidyverse)
 library(janitor)

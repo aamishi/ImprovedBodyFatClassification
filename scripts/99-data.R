@@ -1,9 +1,10 @@
 #### Preamble ####
-# Purpose: Cleans the Marriage License data
+# Purpose: EDA
 # Author: Aamishi Avarsekar
-# Date: 19th September 2024
+# Date: 3rd December 2024
 # Contact: aamishi.avarsekar@mail.utoronto.ca
 # License: MIT
+# Note: this code may not work and is simply my eda work
 
 #### Workspace setup ####
 library(tidyverse)

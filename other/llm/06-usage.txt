@@ -1,0 +1,505 @@
+in this table, i want to visualise the different proportions of bmi_category for the two genders. use r
+
+bmi_category
+ChatGPT said:
+ChatGPT
+To visualize the different proportions of bmi_category for the two genders in R, you can use the ggplot2 package to create a bar plot or a stacked bar plot. Below is an example code that assumes you have a dataset with columns gender and bmi_category:
+
+r
+Copy code
+# Install and load the ggplot2 package if you haven't already
+install.packages("ggplot2")
+library(ggplot2)
+
+# Assuming your data is in a dataframe called 'data'
+# Create a stacked bar plot to visualize the proportions of bmi_category by gender
+ggplot(data, aes(x = gender, fill = bmi_category)) +
+  geom_bar(position = "fill") +  # 'fill' makes it a proportion plot
+  ylab("Proportion") +
+  xlab("Gender") +
+  labs(title = "Proportions of BMI Categories by Gender") +
+  scale_y_continuous(labels = scales::percent) +  # Converts y-axis to percentage format
+  theme_minimal()
+Explanation:
+aes(x = gender, fill = bmi_category) maps gender to the x-axis and bmi_category to the fill color of the bars.
+geom_bar(position = "fill") creates a stacked bar plot where each bar is normalized to show proportions (percentages).
+scale_y_continuous(labels = scales::percent) converts the y-axis to display percentages.
+theme_minimal() applies a clean theme to the plot.
+Let me know if you'd like to adjust or further customize this!
+
+
+
+
+
+
+You said:
+subject_id	gender	height	weight	ankle	wrist	waist_hip_ratio	height_hip_ratio	bmi	bmi_category	fat_percentage_category	height_category	predicted_category
+1	2	165.900	73.300	24.37894	15.73296	0.8963668	1.6054308	26.63246	Overweight	High	160-170	High
+2	1	182.000	82.500	25.64272	18.91100	0.8803563	1.7843654	24.90641	Normal	Moderate	Taller than 180	Moderate
+3	1	183.500	87.700	24.94460	15.92541	0.9027114	1.7087065	26.04519	Overweight	High	Taller than 180	High
+4	1	174.000	73.800	23.49488	17.29473	0.8911211	1.6906231	24.37574	Normal	Moderate	170-180	High
+5	2	170.600	68.400	24.41809	16.30096	0.8321866	1.7121427	23.50163	Normal	Moderate	170-180	Moderate
+ChatGPT said:
+ChatGPT
+Given the data you've provided, here's how you can visualize the proportions of bmi_category by gender using R.
+
+Steps:
+Ensure that bmi_category and gender are factors.
+Use ggplot2 to create a proportion plot (stacked bar plot) of bmi_category by gender.
+R Code:
+r
+Copy code
+# Install and load necessary packages
+install.packages("ggplot2")
+library(ggplot2)
+
+# Sample data (replace this with your actual dataset)
+data <- data.frame(
+  subject_id = 1:5,
+  gender = factor(c(2, 1, 1, 1, 2), labels = c("Female", "Male")),
+  height = c(165.9, 182.0, 183.5, 174.0, 170.6),
+  weight = c(73.3, 82.5, 87.7, 73.8, 68.4),
+  ankle = c(24.37894, 25.64272, 24.94460, 23.49488, 24.41809),
+  wrist = c(15.73296, 18.91100, 15.92541, 17.29473, 16.30096),
+  waist_hip_ratio = c(0.8963668, 0.8803563, 0.9027114, 0.8911211, 0.8321866),
+  height_hip_ratio = c(1.6054308, 1.7843654, 1.7087065, 1.6906231, 1.7121427),
+  bmi = c(26.63246, 24.90641, 26.04519, 24.37574, 23.50163),
+  bmi_category = factor(c("Overweight", "Normal", "Overweight", "Normal", "Normal"),
+                        levels = c("Underweight", "Normal", "Overweight", "Obese")),
+  fat_percentage_category = c("High", "Moderate", "High", "Moderate", "Moderate"),
+  height_category = c("160-170", "Taller than 180", "Taller than 180", "170-180", "170-180"),
+  predicted_category = c("High", "Moderate", "High", "High", "Moderate")
+)
+
+# Create a stacked bar plot to visualize proportions of bmi_category by gender
+ggplot(data, aes(x = gender, fill = bmi_category)) +
+  geom_bar(position = "fill") +  # 'fill' makes it a proportion plot
+  ylab("Proportion") +
+  xlab("Gender") +
+  labs(title = "Proportions of BMI Categories by Gender") +
+  scale_y_continuous(labels = scales::percent) +  # Converts y-axis to percentage format
+  theme_minimal()
+Explanation:
+gender is coded as 1 (Male) and 2 (Female) in your data, and I have labeled them accordingly in the factor() function.
+bmi_category is categorized as Underweight, Normal, Overweight, and Obese in the levels.
+geom_bar(position = "fill") ensures the bars show proportions (percentages).
+scale_y_continuous(labels = scales::percent) converts the y-axis to percentage format.
+This will generate a plot that shows the proportions of different bmi_category values (like Overweight, Normal) within each gender.
+
+
+
+
+
+
+You said:
+and how the difference in waist_hip_ratio
+ChatGPT said:
+ChatGPT
+To visualize the difference in waist_hip_ratio between the two genders, you can create boxplots, which will help to show the distribution of waist_hip_ratio for each gender. Here's how you can do it in R:
+
+R Code for Boxplot:
+r
+Copy code
+# Create a boxplot to visualize the distribution of waist_hip_ratio by gender
+ggplot(data, aes(x = gender, y = waist_hip_ratio, fill = gender)) +
+  geom_boxplot() +
+  ylab("Waist-to-Hip Ratio") +
+  xlab("Gender") +
+  labs(title = "Distribution of Waist-to-Hip Ratio by Gender") +
+  theme_minimal() +
+  scale_fill_manual(values = c("Female" = "lightblue", "Male" = "lightgreen"))
+Explanation:
+aes(x = gender, y = waist_hip_ratio, fill = gender) maps the gender variable to the x-axis and waist_hip_ratio to the y-axis, filling the boxes based on gender.
+geom_boxplot() creates the boxplot.
+scale_fill_manual() customizes the color of the boxplots for each gender (you can choose any color).
+theme_minimal() applies a clean plot theme.
+This will give you a clear view of the distribution of waist_hip_ratio for each gender, showing the median, interquartile range, and potential outliers.
+
+
+
+
+
+
+You said:
+Warning: Continuous x aesthetic
+ℹ did you forget aes(group = ...)?
+Warning: The following aesthetics were dropped during statistical transformation: fill.
+ℹ This can happen when ggplot fails to infer the correct grouping structure in the
+  data.
+ℹ Did you forget to specify a group aesthetic or to convert a numerical variable into
+  a factor?
+Warning: No shared levels found between names(values) of the manual scale and the data's fill
+values.
+ChatGPT said:
+ChatGPT
+The warning you're seeing indicates that there is an issue with how gender is being handled in the plot. Specifically, the fill aesthetic is not working properly because gender is being treated as a continuous variable rather than a categorical one. Additionally, it seems like the plot is expecting a grouping structure.
+
+Let's fix this by ensuring gender is treated as a factor and adjusting the aesthetics to handle the fill and grouping correctly. Here's the corrected code:
+
+Updated R Code:
+r
+Copy code
+# Make sure gender is a factor
+data$gender <- factor(data$gender, labels = c("Female", "Male"))
+
+# Create a boxplot to visualize the distribution of waist_hip_ratio by gender
+ggplot(data, aes(x = gender, y = waist_hip_ratio, fill = gender)) +
+  geom_boxplot() +
+  ylab("Waist-to-Hip Ratio") +
+  xlab("Gender") +
+  labs(title = "Distribution of Waist-to-Hip Ratio by Gender") +
+  theme_minimal() +
+  scale_fill_manual(values = c("Female" = "lightblue", "Male" = "lightgreen"))
+Changes made:
+Ensure gender is a factor: data$gender <- factor(data$gender, labels = c("Female", "Male")) converts gender to a factor and assigns labels for clarity.
+fill aesthetic should now work correctly since gender is treated as a categorical variable.
+scale_fill_manual: This ensures that the colors for the genders are applied correctly.
+This code should now generate a boxplot with the correct grouping and coloring for gender, allowing you to compare the distributions of waist_hip_ratio between the two genders.
+
+
+
+
+
+
+You said:
+create a visualisation for the differences in ankle and wrist for bmi _category = overweight and obese
+ChatGPT said:
+ChatGPT
+To visualize the differences in ankle and wrist measurements for bmi_category values "Overweight" and "Obese", you can create separate boxplots for each bmi_category. This will help you compare how ankle and wrist measurements vary within those two BMI categories.
+
+Here’s the R code to do that:
+
+R Code for Visualization:
+r
+Copy code
+# Filter data for bmi_category = "Overweight" and "Obese"
+filtered_data <- subset(data, bmi_category %in% c("Overweight", "Obese"))
+
+# Create a combined boxplot to visualize differences in ankle and wrist for bmi_category = Overweight and Obese
+ggplot(filtered_data, aes(x = bmi_category, y = ankle, fill = bmi_category)) +
+  geom_boxplot() +
+  ylab("Ankle Measurement") +
+  xlab("BMI Category") +
+  labs(title = "Comparison of Ankle Measurements for Overweight and Obese BMI Categories") +
+  theme_minimal() +
+  scale_fill_manual(values = c("Overweight" = "lightcoral", "Obese" = "lightsalmon")) +
+  theme(legend.position = "none")
+
+# Create another combined boxplot for wrist measurements
+ggplot(filtered_data, aes(x = bmi_category, y = wrist, fill = bmi_category)) +
+  geom_boxplot() +
+  ylab("Wrist Measurement") +
+  xlab("BMI Category") +
+  labs(title = "Comparison of Wrist Measurements for Overweight and Obese BMI Categories") +
+  theme_minimal() +
+  scale_fill_manual(values = c("Overweight" = "lightcoral", "Obese" = "lightsalmon")) +
+  theme(legend.position = "none")
+Explanation:
+Data Filtering: The subset() function filters the data to include only the rows where bmi_category is either "Overweight" or "Obese".
+Boxplot for ankle measurements: The first ggplot command creates a boxplot comparing the ankle measurements for the two BMI categories.
+Boxplot for wrist measurements: The second ggplot command creates a boxplot comparing the wrist measurements for the two BMI categories.
+Coloring: The scale_fill_manual() function is used to assign different colors to the "Overweight" and "Obese" categories.
+Theme Adjustments: The theme(legend.position = "none") removes the legend, as it's not necessary for this plot.
+This will give you two boxplots, one for the ankle measurements and one for the wrist measurements, comparing the "Overweight" and "Obese" BMI categories. Let me know if you'd like further customization!
+
+
+
+
+
+
+You said:
+provide levels for the bmi catories. right now they are sorted by alphatical order
+ChatGPT said:
+ChatGPT
+To ensure that the bmi_category is ordered correctly (e.g., "Underweight", "Normal", "Overweight", "Obese"), you need to set the factor levels explicitly in R. This will ensure that the categories are ordered according to BMI classifications rather than alphabetically.
+
+R Code for Setting Factor Levels:
+r
+Copy code
+# Set the correct factor levels for bmi_category
+data$bmi_category <- factor(data$bmi_category, 
+                            levels = c("Underweight", "Normal", "Overweight", "Obese"))
+
+# Check if the levels are correctly assigned
+levels(data$bmi_category)
+Explanation:
+factor(data$bmi_category, levels = c("Underweight", "Normal", "Overweight", "Obese")) sets the levels in the desired order.
+The levels of the bmi_category column are now explicitly ordered as "Underweight", "Normal", "Overweight", and "Obese" (adjust the order as per your specific requirement).
+Once the levels are set, the boxplots and other plots will respect this order instead of sorting them alphabetically. You can then proceed with the visualizations provided earlier.
+
+
+
+
+
+
+You said:
+can i have the anke and wrist graphs side by side isntead of 2?
+ChatGPT said:
+ChatGPT
+Yes, you can place the ankle and wrist boxplots side by side using ggplot2 and the facet_wrap() function. This will allow you to create a single plot with both boxplots next to each other for easy comparison.
+
+R Code for Side-by-Side Boxplots:
+r
+Copy code
+# Filter data for bmi_category = "Overweight" and "Obese"
+filtered_data <- subset(data, bmi_category %in% c("Overweight", "Obese"))
+
+# Reshape the data to gather 'ankle' and 'wrist' into one column for faceting
+library(tidyr)
+long_data <- filtered_data %>%
+  gather(key = "Measurement", value = "Value", ankle, wrist)
+
+# Create side-by-side boxplots for ankle and wrist measurements
+ggplot(long_data, aes(x = bmi_category, y = Value, fill = bmi_category)) +
+  geom_boxplot() +
+  facet_wrap(~ Measurement) +  # This creates separate panels for 'ankle' and 'wrist'
+  ylab("Measurement Value") +
+  xlab("BMI Category") +
+  labs(title = "Comparison of Ankle and Wrist Measurements for Overweight and Obese BMI Categories") +
+  theme_minimal() +
+  scale_fill_manual(values = c("Overweight" = "lightcoral", "Obese" = "lightsalmon")) +
+  theme(legend.position = "none")
+Explanation:
+Data Reshaping: The gather() function from the tidyr package reshapes the data, turning the ankle and wrist columns into a single "Measurement" column. This allows us to facet the data by the measurement type.
+Facet Plot: facet_wrap(~ Measurement) creates separate plots (facets) for ankle and wrist measurements, displayed side by side.
+Colors: scale_fill_manual() is used to assign different colors for the "Overweight" and "Obese" categories.
+This will give you a side-by-side visualization of ankle and wrist measurements for the "Overweight" and "Obese" BMI categories.
+
+
+
+
+
+
+You said:
+ggplot(data, aes(x \= gender, fill \= bmi\_category)) + geom\_bar(position \= "fill") + \# 'fill' makes it a proportion plot ylab("Proportion") + xlab("Gender") + labs(title \= "Proportions of BMI Categories by Gender") + scale\_y\_continuous(labels \= scales::percent) + \# Converts y-axis to percentage format theme\_minimal()
+
+can you provide this for two different datasets? data1 and data2?
+ChatGPT said:
+ChatGPT
+To visualize side-by-side boxplots for ankle and wrist measurements for both data1 and data2, we can modify the previous code slightly. We’ll need to combine both datasets into a single dataframe with an additional column to indicate which dataset each row belongs to. Then we can use facet_wrap() to show the side-by-side comparison for both datasets.
+
+R Code for Comparing Two Datasets (data1 and data2):
+r
+Copy code
+# Combine the two datasets with an additional column indicating the dataset
+data1$dataset <- "Data1"
+data2$dataset <- "Data2"
+
+# Combine data1 and data2 into one dataset
+combined_data <- rbind(data1, data2)
+
+# Filter data for bmi_category = "Overweight" and "Obese"
+filtered_combined_data <- subset(combined_data, bmi_category %in% c("Overweight", "Obese"))
+
+# Reshape the data to gather 'ankle' and 'wrist' into one column for faceting
+library(tidyr)
+long_combined_data <- filtered_combined_data %>%
+  gather(key = "Measurement", value = "Value", ankle, wrist)
+
+# Create side-by-side boxplots for ankle and wrist measurements, split by dataset
+ggplot(long_combined_data, aes(x = bmi_category, y = Value, fill = bmi_category)) +
+  geom_boxplot() +
+  facet_wrap(~ Measurement + dataset, scales = "free_y") +  # Facet by both Measurement and Dataset
+  ylab("Measurement Value") +
+  xlab("BMI Category") +
+  labs(title = "Comparison of Ankle and Wrist Measurements for Overweight and Obese BMI Categories") +
+  theme_minimal() +
+  scale_fill_manual(values = c("Overweight" = "lightcoral", "Obese" = "lightsalmon")) +
+  theme(legend.position = "none")
+Explanation:
+Combining Data: We add a new column dataset to both data1 and data2 to identify which dataset each row comes from. Then we use rbind() to combine both datasets into a single dataset, combined_data.
+Filtering Data: We filter for bmi_category values "Overweight" and "Obese" in the combined dataset.
+Reshaping Data: The gather() function is used to convert ankle and wrist measurements into a single column for easy faceting.
+Faceting: facet_wrap(~ Measurement + dataset) is used to create separate plots for each measurement (ankle and wrist), and it also separates them by dataset (data1 vs data2).
+Customization: scale_fill_manual() customizes the color of the boxplots based on bmi_category, and theme_minimal() gives the plot a clean look.
+This approach will create side-by-side boxplots for the ankle and wrist measurements, comparing the "Overweight" and "Obese" BMI categories for both data1 and data2.
+
+
+
+
+
+
+You said:
+\# Reshape the data to gather 'ankle' and 'wrist' into one column for faceting library(tidyr) long\_combined\_data <- filtered\_combined\_data %>% gather(key \= "Measurement", value \= "Value", ankle, wrist)
+
+i dont want both, just one
+ChatGPT said:
+ChatGPT
+To create the side-by-side boxplots for just one dataset (either data1 or data2), you can remove the combination of the two datasets and reshape only the selected dataset.
+
+Here’s the modified code for just one dataset (e.g., data1):
+
+R Code for Visualizing One Dataset (data1):
+r
+Copy code
+# Filter data for bmi_category = "Overweight" and "Obese" for data1
+filtered_data1 <- subset(data1, bmi_category %in% c("Overweight", "Obese"))
+
+# Reshape the data to gather 'ankle' and 'wrist' into one column for faceting
+library(tidyr)
+long_data1 <- filtered_data1 %>%
+  gather(key = "Measurement", value = "Value", ankle, wrist)
+
+# Create side-by-side boxplots for ankle and wrist measurements
+ggplot(long_data1, aes(x = bmi_category, y = Value, fill = bmi_category)) +
+  geom_boxplot() +
+  facet_wrap(~ Measurement, scales = "free_y") +  # Facet by Measurement only
+  ylab("Measurement Value") +
+  xlab("BMI Category") +
+  labs(title = "Comparison of Ankle and Wrist Measurements for Overweight and Obese BMI Categories") +
+  theme_minimal() +
+  scale_fill_manual(values = c("Overweight" = "lightcoral", "Obese" = "lightsalmon")) +
+  theme(legend.position = "none")
+Key Points:
+Filtering for data1: We apply the filter to data1 only, keeping the bmi_category values "Overweight" and "Obese".
+Reshaping: The gather() function reshapes the ankle and wrist measurements into a single column for easy faceting, just for data1.
+Faceting: The facet_wrap(~ Measurement) separates the ankle and wrist boxplots into two panels, one for each measurement.
+Coloring: The scale_fill_manual() function assigns different colors to the "Overweight" and "Obese" categories.
+This will give you a side-by-side comparison of ankle and wrist measurements for just the data1 dataset, for the BMI categories "Overweight" and "Obese". You can apply the same logic for data2 if needed by replacing data1 with data2 in the code.
+
+
+
+
+
+
+You said:
+no both datasets for just fat_percentage_category
+ChatGPT said:
+ChatGPT
+To compare the fat_percentage_category between the two datasets (data1 and data2), while keeping the side-by-side boxplots for ankle and wrist, you can follow the same approach as before, but you will facet by fat_percentage_category instead of bmi_category.
+
+Here is the updated code for comparing both datasets for fat_percentage_category:
+
+R Code for Comparing Both Datasets by fat_percentage_category:
+r
+Copy code
+# Add a column indicating the dataset (data1 or data2)
+data1$dataset <- "Data1"
+data2$dataset <- "Data2"
+
+# Combine both datasets
+combined_data <- rbind(data1, data2)
+
+# Filter data for bmi_category = "Overweight" and "Obese" and use fat_percentage_category
+filtered_combined_data <- subset(combined_data, bmi_category %in% c("Overweight", "Obese"))
+
+# Reshape the data to gather 'ankle' and 'wrist' into one column for faceting
+library(tidyr)
+long_combined_data <- filtered_combined_data %>%
+  gather(key = "Measurement", value = "Value", ankle, wrist)
+
+# Create side-by-side boxplots for ankle and wrist measurements, faceted by fat_percentage_category and dataset
+ggplot(long_combined_data, aes(x = fat_percentage_category, y = Value, fill = fat_percentage_category)) +
+  geom_boxplot() +
+  facet_wrap(~ Measurement + dataset, scales = "free_y") +  # Facet by both Measurement and Dataset
+  ylab("Measurement Value") +
+  xlab("Fat Percentage Category") +
+  labs(title = "Comparison of Ankle and Wrist Measurements for Different Fat Percentage Categories") +
+  theme_minimal() +
+  scale_fill_manual(values = c("Low" = "lightblue", "Moderate" = "lightgreen", "High" = "lightcoral", "Extreme" = "lightsalmon")) +
+  theme(legend.position = "none")
+Explanation:
+Combining Data: We add a new dataset column to both data1 and data2 to identify the source of the data and then combine them using rbind().
+Filtering: The dataset is filtered to keep only rows with bmi_category values "Overweight" and "Obese".
+Reshaping: The gather() function is used to reshape the ankle and wrist measurements into a single column for easy faceting.
+Faceting: facet_wrap(~ Measurement + dataset) separates the boxplots by both Measurement (ankle and wrist) and dataset (data1 or data2).
+Coloring: The scale_fill_manual() function assigns specific colors to the different fat_percentage_category values, such as "Low", "Moderate", "High", and "Extreme".
+This will give you side-by-side boxplots for ankle and wrist measurements, comparing the two datasets (data1 and data2) for each fat_percentage_category.
+
+
+
+
+
+
+You said:
+i want to show ONLY THE DIFFERENCE IN fat_percentage_category across data1 and data2
+ChatGPT said:
+ChatGPT
+To visualize only the differences in fat_percentage_category across data1 and data2, you can group the data by fat_percentage_category and dataset and calculate summary statistics, then use a visualization (like a bar plot or grouped boxplots) to highlight the differences.
+
+Here’s how to achieve this:
+
+R Code to Compare fat_percentage_category Across Datasets:
+r
+Copy code
+# Add a column indicating the dataset (data1 or data2)
+data1$dataset <- "Data1"
+data2$dataset <- "Data2"
+
+# Combine both datasets
+combined_data <- rbind(data1, data2)
+
+# Count occurrences of each fat_percentage_category per dataset
+library(dplyr)
+category_counts <- combined_data %>%
+  group_by(dataset, fat_percentage_category) %>%
+  summarise(Count = n(), .groups = "drop")
+
+# Create a bar plot to visualize the differences
+library(ggplot2)
+ggplot(category_counts, aes(x = fat_percentage_category, y = Count, fill = dataset)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Comparison of Fat Percentage Categories Across Data1 and Data2",
+       x = "Fat Percentage Category", y = "Count") +
+  theme_minimal() +
+  scale_fill_manual(values = c("Data1" = "lightblue", "Data2" = "lightgreen"))
+Explanation:
+Combining Datasets: The data1 and data2 datasets are combined with an additional column dataset to distinguish between them.
+Counting Categories: The dplyr pipeline groups by dataset and fat_percentage_category, then counts the occurrences for each category in each dataset.
+Bar Plot: A grouped bar plot is created using ggplot2, with fat_percentage_category on the x-axis, counts on the y-axis, and bars grouped by dataset.
+Color Customization: Different colors are assigned to data1 and data2 using scale_fill_manual().
+Output:
+This plot will clearly show the counts of each fat_percentage_category (e.g., "Low", "Moderate", "High", "Extreme") for data1 and data2, allowing you to compare how the categories differ across the two datasets.
+
+
+
+
+
+
+You said:
+can you create proportions instead of actual counts? datasets have different number of rows
+ChatGPT said:
+ChatGPT
+To create a proportional comparison of fat_percentage_category across data1 and data2, we need to calculate the proportion of each category relative to the total number of rows in each dataset. Here's how:
+
+R Code for Proportional Comparison:
+r
+Copy code
+# Add a column indicating the dataset (data1 or data2)
+data1$dataset <- "Data1"
+data2$dataset <- "Data2"
+
+# Combine both datasets
+combined_data <- rbind(data1, data2)
+
+# Calculate proportions for each fat_percentage_category per dataset
+library(dplyr)
+proportions <- combined_data %>%
+  group_by(dataset, fat_percentage_category) %>%
+  summarise(Count = n(), .groups = "drop") %>%
+  mutate(Proportion = Count / sum(Count))
+
+# Create a bar plot to visualize the proportions
+library(ggplot2)
+ggplot(proportions, aes(x = fat_percentage_category, y = Proportion, fill = dataset)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Proportional Comparison of Fat Percentage Categories Across Data1 and Data2",
+       x = "Fat Percentage Category", y = "Proportion") +
+  scale_y_continuous(labels = scales::percent) +  # Show proportions as percentages
+  theme_minimal() +
+  scale_fill_manual(values = c("Data1" = "lightblue", "Data2" = "lightgreen"))
+Explanation:
+Proportion Calculation:
+
+Group the combined dataset by dataset and fat_percentage_category.
+Count occurrences of each fat_percentage_category (n()).
+Calculate the proportion by dividing each count by the total count for that dataset (Count / sum(Count)).
+Visualization:
+
+A bar plot is created with fat_percentage_category on the x-axis, proportions on the y-axis, and bars grouped by dataset.
+The y-axis is formatted as percentages using scale_y_continuous(labels = scales::percent).
+Color Customization:
+
+Use scale_fill_manual() to differentiate between data1 and data2 with distinct colors.
+Output:
+This plot will show the proportions of each fat_percentage_category (e.g., "Low", "Moderate", "High", "Extreme") as percentages, grouped by data1 and data2. This ensures the comparison is valid even if the datasets have different numbers of rows.

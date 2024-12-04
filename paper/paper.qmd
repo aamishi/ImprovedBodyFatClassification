@@ -1,12 +1,12 @@
 ---
-title: "How General Health Index (GHI) performs better to predict health levels"
-subtitle: "A comparitive analysis of GHI and BMI against body measurements"
+title: "Classification of Body Fat based on Physical Measurements and Body Composition"
+subtitle: "A comparitive analysis of methods of classifying body fat"
 author: 
   - Aamishi Avarsekar
 thanks: "Code and data are available at: https://github.com/aamishi/ImprovedGeneralHealthIndex/"
 date: today
 date-format: long
-abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
+abstract: "BMI values fail to acknowledge the different body composition across both sexes. Using the Waist-Hip-Ratio is more accurate at estimating body fat levels using simple methods at home. This paper compares how this model performs against actual body composition such as isolated fat mass. Using this method makes self-identification of obsesity more accessible and preventive measures can be taken earlier."
 format: pdf
 number-sections: true
 bibliography: references.bib
@@ -175,7 +175,7 @@ ggplot(cleaned_data_model, aes(x = gender, y = waist_hip_ratio, fill = gender)) 
 #| eval: true
 #| warning: false
 #| message: false
-cleaned_data_model$gender <- factor(cleaned_data_model$gender, labels = c("Female", "Male"))
+# cleaned_data_model$gender <- factor(cleaned_data_model$gender, labels = c("Female", "Male"))
 
 cleaned_data_model$bmi_category <- factor(cleaned_data_model$bmi_category, 
                             levels = c("Underweight", "Normal", "Overweight", "Obese"))
@@ -234,7 +234,7 @@ The main variables that I considered fat mass percentage fm. This variable is ob
 #| warning: false
 #| message: false
 # Recode gender levels
-body_mass_model %>%
+body_mass_model_data_section <- body_mass_model %>%
   mutate(gender = factor(gender, levels = c(1, 2), labels = c("Male", "Female"))) %>%
   mutate(fat_percentage_category = factor(fat_percentage_category,
                                           levels = c("Low", "Moderate", "High", "Extreme"))) %>%
@@ -243,7 +243,7 @@ body_mass_model %>%
     fat_percentage_category = as.factor(fat_percentage_category)
   )
   
-ggplot(body_mass_model, aes(x = gender, fill = fat_percentage_category)) +
+ggplot(body_mass_model_data_section, aes(x = gender, fill = fat_percentage_category)) +
   geom_bar(position = "fill") +  # 'fill' makes it a proportion plot
   ylab("Proportion") +
   xlab("Gender") +
@@ -524,9 +524,7 @@ I also computed the RSME to evaluate the model’s performance as a lower RSME i
 
 
 # Results
-## Model Results for Measurements Model
-
-Our results are summarized in @tbl-measurementmodelresults. Our model's results and interpretation:
+Our results are summarized in @tbl-measurementmodelresults and @tbl-bodymass-modelresults. Our model's results and interpretation:
 
 ```{r}
 #| echo: false
@@ -545,10 +543,8 @@ measurements_summary_df <- as.data.frame(measurements_model_summary$coefficients
 # Create and style the table
 kable(measurements_summary_df, caption = "Summary of Measurements Model")
 ```
+From the table {} we can see that the intercepts are very low and negative. The probability of the model making a classification is very unlikely with the catgegory with the highest probability being high. As our data is composed of people with a desire to improve body image, this makes sense, as the people with higher fat percentages are more likely to participate in such a study. `waist_hip_ratio` has a negative correlation with the levels of the fat percentage category prediction. High `waist_hip_ratio`s are associated with higher body fat percentage. So the lower a person's `waist_hip_ratio` is, the less likely the model classifies them in the `high` category. On the other hand, `height_hip_ratio` has a positive relation with the classification levels. `height_hip_ratio` takes into a consideration the overall mass (and fat) distribution of a person vertically. So if a person has a more evenly distributed composition, they would have a higher `height_hip_ratio` ratio with a higher chance of being classified in a lower fat category. Despite the model having very few subjects that were underweight, the classification between Underweight and Normal BMI values has improved with more diverse factors. It is likely that Normal BMI categories are also being correctly identified with lower fat levels. There is a negative correlation with the heights of the subjects suggesting that taller people are less likely to be classified with higher levels of fat. Detailed interpretation of this fact is later discussed in the Results Section {}.
 
-## Model Results for Body Mass Model
-
-Our results are summarized in @tbl-bodymass-modelresults. Our model's results and interpretation:
 
 ```{r}
 #| echo: false
@@ -565,16 +561,167 @@ body_mass_model_summary <- summary(body_mass_model_paper)
 body_mass_summary_df <- as.data.frame(body_mass_model_summary$coefficients)
 
 # Create and style the table
-kable(body_mass_summary_df, caption = "Summary of Measurements Model")
+kable(body_mass_summary_df, caption = "Summary of Body Mass Model")
 ```
 
+The negative intercepts indicate that in the absence of any predictors, the model has very low estimates for the body fat classifications. However, the model is most likeyly to classify a person in the `High` category owing to the distribution of the dataset. The positive intercept for a `Normal` classification mean that the taller a person is, the more likely they are to be classified as `Normal`. As this model is directly based on the actual body composition of a person, the increasing levels of fat percentage indicated by `fm` show that the higher percentage of fat that a person has, the more likely they would be higher in the classification levels.
+
+
+
+## Predictions based body circumferences overgeneralize the population
+
+```{r}
+
+# measurements_results <- cleaned_data_model %>%
+#   select(gender, height, weight, height_category, fat_percentage_category, predicted_category) %>%
+#  mutate(source = "Measurements")
+# 
+# body_composition_results <- body_mass_model %>%
+#   select(gender, height, weight, height_category, fat_percentage_category, predicted_category) %>%
+# mutate(source = "Body Composition")
+# 
+# elongated_data <- bind_rows(measurements_results, body_composition_results)
+# 
+# ggplot(elongated_data, aes(x = predicted_category, fill = source)) +
+#   geom_density(alpha = 0.5) +
+#   facet_wrap(~ predicted_category) +
+#   labs(title = "Density Plot of Predicted Categories by Source",
+#        x = "Predicted Category",
+#        y = "Density",
+#        fill = "Source") +
+#   theme_minimal()
+```
+From the above prediction density chart by each model per fat percentage category, we see that the Measurements model has higher peaks at the each classification. This suggests that more people are being classified into a similar category only based on their physical traits such as height and Waist-to-Hip ratio. The peaks of each category from the Body Composition is accurate in identifying the major classification. However, the distribution not being as concentrated as from the Measurements model suggest that the diversification of different body types is being identified properly.
+
+```{r chunk-name}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+levels_results <- union(levels(cleaned_data_model$predicted_category), levels(body_mass_model$predicted_category))
+
+
+measurements_results <- cleaned_data_model %>%
+  select(height, weight, height_category, fat_percentage_category, predicted_category) %>%
+  mutate(source = "Measurements") 
+
+body_composition_results <- body_mass_model %>%
+  select(height, weight, height_category, fat_percentage_category, predicted_category) %>%
+ mutate(source = "BodyComposition")
+
+elongated_data <- bind_rows(measurements_results, body_composition_results)
+
+# Calculate the percentage of each predicted category
+category_percentage_by_source <- elongated_data %>%
+  group_by(source, predicted_category) %>%
+  summarise(count = n()) %>%
+  mutate(percentage = (count / sum(count)) * 100) %>%
+  select(source, predicted_category, percentage)
+
+category_percentage_by_source_height <- elongated_data %>%
+  group_by(source, height_category, predicted_category) %>%
+  summarise(count = n()) %>%
+  mutate(percentage = (count / sum(count)) * 100) %>%
+  select(source, height_category, predicted_category, percentage)
+
+# Print the result
+print(category_percentage_by_source)
+
+ggplot(category_percentage_by_source, aes(x = predicted_category, y = percentage, fill = source)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Percentage of Predicted Categories by Source",
+       x = "Predicted Category",
+       y = "Percentage (%)") +
+  theme_minimal() +
+  scale_fill_manual(values = c("Measurements" = "skyblue", "BodyComposition" = "grey")) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels if needed
+```
+## The Body Composition Model has diverse classifcation for different heights groups
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+# Calculate proportions for each combination of predicted_category, height_category, and source
+category_proportions <- elongated_data %>%
+  group_by(height_category, predicted_category, source) %>%
+  summarise(count = n()) %>%
+  group_by(height_category, source) %>%
+  mutate(percentage = (count / sum(count)) * 100)
+
+# Create the stacked bar plot
+ggplot(category_proportions, aes(x = height_category, y = percentage, fill = predicted_category)) +
+  geom_bar(stat = "identity", position = "stack") +
+  facet_wrap(~ source) +
+  labs(title = "Proportion of Predicted Categories by Height Category and Source",
+       x = "Height Category",
+       y = "Percentage (%)",
+       fill = "Predicted Category") +
+  theme_minimal() +
+  scale_fill_brewer(palette = "Set1") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels
+```
+
+The primary shortfall of the BMI categories was that it failed to differententiate the body types based on other factors such as where the fat was collected. From the above graph, we can see that across different heights, the Measurements Model is pretty consistent with providing similar proportions for different fat categories. This suggest that it was group people on too broad categories that did not necessarily capture the right effect of height of body compostion. Specifically, BMI fails to recognize the vertical spread of fat accumulation and so taller people get naturally classified as having lower fat levels. However, the body composition model, has a better ability a higher percentage of people actually have a higher classification of high and extreme body fat across all height groups.
+
+## Differentiating between different levels of Obeseity.
+
+## What BMI fails to capture
+```{r}
+
+  # Function to categorize weight
+  
+cleaned_data_model <- cleaned_data_model %>%
+  mutate(weight_category = cut(weight, 
+                               breaks = seq(40, 150, by = 10), # Specify your range
+                               labels = c("40-50", "50-60", "60-70", "70-80", "80-90", "90-100", "100-110", "110-120", "120-130", "130-140", "140-150"),
+                               include.lowest = TRUE))
+
+# Apply the same logic for body_data
+body_mass_model <- body_mass_model %>%
+  mutate(weight_category = cut(weight, 
+                               breaks = seq(40, 150, by = 10), # Specify your range
+                               labels = c("40-50", "50-60", "60-70", "70-80", "80-90", "90-100", "100-110", "110-120", "120-130", "130-140", "140-150"),
+                               include.lowest = TRUE))
+
+# Assuming measurements_data and body_data have the same structure
+measurements_long <- cleaned_data_model %>%
+  select(weight_category, predicted_category, bmi_category) %>%
+  pivot_longer(cols = c(predicted_category, bmi_category),
+               names_to = "category_type",
+               values_to = "category") %>%
+  mutate(source = "Measurements")
+
+body_data_long <- body_mass_model %>%
+  select(weight_category, predicted_category, bmi_category) %>%
+  pivot_longer(cols = c(predicted_category, bmi_category),
+               names_to = "category_type",
+               values_to = "category") %>%
+  mutate(source = "Body Composition")
+
+# Combine both datasets into one for easy plotting
+combined_data <- bind_rows(measurements_long, body_data_long)
+  
+  ggplot(combined_data, aes(x = weight_category, fill = category)) +
+  geom_bar(position = "fill", alpha = 0.6) +
+  facet_grid(category_type ~ source, scales = "free_y") +  # Facet by category_type and source
+  labs(title = "Proportions of Categories by Weight Range and Dataset",
+       x = "Weight Range (kg)",
+       y = "Proportion",
+       fill = "Category") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+
+```
 
 
 # Discussion
 
-## First discussion point {#sec-first-point}
+## Obesity Risk Identification {#sec-first-point}
 
-- height is not all, personality is more important
+This paper's main goal was to compare how accurate are body measurements to estimate fat percentage at home. Other ways of estimating a person's body fat include scans like DEXA {source}. These scans are expensive and inaccessible. Most people turn to measuring BMI's to estimate their general level of health. The Government of Cananda also advices that adults use BMI to estimate their health []. As seen in this paper, this inherently flawed as BMI fails to capture the composition of a body. However, even the introduction of simple measurement like Waist-to-Hip ratio, shows that there is a general improvement in differentiating fat levels. The Waist-to-Hip ratio is especially important between the two sexes as fat accumulation pattern differs, which is not even considered in the BMI formula. Additionally, as a higher proportion of people are classified as Normal using BMI, without failing to recognise that having a high level of fat despite having a lower BMI is still dangerous as it could potentially prevent them from seeking early care against illnesses like insulin resistance. Insulin resistance occurs when there is a body fat percentage of {}. By popularising a more accurate system, we could urge people to take earlier preventive care. 
+
 ## Second discussion point
 
 Please don't use these as sub-heading labels - change them to be what your point actually is.
@@ -627,7 +774,10 @@ we compare the posterior with the prior. This shows...
 # plot(residuals)
 ```
 
-
+# ```{r}
+# modelplot(political_preferences, conf_level = 0.9) +
+#   labs(x = "90 per cent credibility interval")
+# ```
 
 \newpage
 
