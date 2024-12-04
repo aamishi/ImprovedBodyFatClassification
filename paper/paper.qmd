@@ -3,7 +3,7 @@ title: "Classification of Body Fat based on Physical Measurements and Body Compo
 subtitle: "A comparitive analysis of methods of classifying body fat"
 author: 
   - Aamishi Avarsekar
-thanks: "Code and data are available at: https://github.com/aamishi/ImprovedGeneralHealthIndex/"
+thanks: "Code and data are available at: https://github.com/aamishi/ImprovedBodyFatClassification"
 date: today
 date-format: long
 abstract: "BMI values fail to acknowledge the different body composition across both sexes. Using the Waist-Hip-Ratio is more accurate at estimating body fat levels using simple methods at home. This paper compares how this model performs against actual body composition such as isolated fat mass. Using this method makes self-identification of obsesity more accessible and preventive measures can be taken earlier."
@@ -32,12 +32,14 @@ body_mass_model <- read_parquet(file = here::here("data/analysis_data/body_mass_
 
 # Introduction {#paper-intro}
 
-BMI is a common indicator for general health but it has its limitations. It does not take into consideration the actual body composition of an individual and other important factors such as sex and age. In its initial design, BMI was designed using only male [] subjects and thus cannot be applied to females. Due to its inability to capture body composition, a lot of false positives and false negatives are produced. Through this paper, I would like to compare how using the Waist-to-Hip Ratio (WHR) serves as a more accurate way of estimating your body fat levels at home. The inspiration for using the WHR stems from fat accumulation patterns and distribution of fat vertically. This also helps us further differentiate between closer classifications of BMI such as Underweight and Normal Categories and Overweight and Obese Categories. BMI is notorious for classifications. A popular example of this would be body builders being classfied as Overweight according to BMI despite having lower levels for body fat and being at a lower risk of obesity health risks. On the other had, taller people are often excused as false negatives and are failed to be recognized as having higher body fat levels due to their height. The table {} below includes the BMI categories as endorsed by the Government of Canada.
+BMI is a common indicator for general health but it has its limitations. It does not take into consideration the actual body composition of an individual and other important factors such as sex and age. In its initial design, BMI was designed using only male subjects and thus cannot be applied to females. Due to its inability to capture body composition, a lot of false positives and false negatives are produced. Through this paper, I would like to compare how using the Waist-to-Hip Ratio (WHR) serves as a more accurate way of estimating your body fat levels at home. The inspiration for using the WHR stems from fat accumulation patterns and distribution of fat vertically. This also helps us further differentiate between closer classifications of BMI such as Underweight and Normal Categories and Overweight and Obese Categories. BMI is notorious for classifications. A popular example of this would be body builders being classified as Overweight according to BMI despite having lower levels for body fat and being at a lower risk of obesity health risks. On the other had, taller people are often excused as false negatives and are failed to be recognized as having higher body fat levels due to their height. The table [@tbl-gov-can-bmi] below includes the BMI categories as endorsed by the Government of Canada.
 
 ```{r}
 #| warning: false
 #| message: false
 #| echo: false
+#| label: tbl-gov-can-bmi
+#| tbl-cap: "BMI vs. Fat Mass by BMI Category"
 bmi_canada_gov <- data.frame(
   Category = c("Underweight", "Normal weight", "Overweight", "Obese - Class I", "Obese - Class II", "Obese - Class III"),
   `BMI Range` = c("Below 18.5", "18.5–24.9", "25.0–29.9", "30.0–34.9", "35.0–39.9", "40.0 and above")
@@ -360,23 +362,6 @@ Some paragraphs about how we go from a phenomena in the world to an entry in the
 #| message: false
 #| echo: false
 ```
-
-Talk more about it.
-
-
-```{r}
-#| warning: false
-#| message: false
-#| echo: false
-```
-
-Talk way more about it. 
-
-## Predictor variables
-
-Add graphs, tables and text.
-
-Use sub-sub-headings for each outcome variable and feel free to combine a few into one if they go together naturally.
 
 
 
