@@ -57,42 +57,20 @@ Through this paper, I analyse how common factors such as sex, height and weight 
 
 It is a known fact that BMI generalizes several body types based only on height and weight considerations. However, through the work of this paper, it can be noted that High and Extreme levels of body fat are completely disregarded through WHR calculations. Both data sets and models show an increasing trend in body fat levels as weight increases. The model on measurements data predicts a smooth increase of body fat as a person's weight increases. However, the model based on body compositions predicts a steeper increase in body fat as a person's weight increases. This fact is more obvious when data is faceted by sex.
 
-This paper uses the R Programming Language {@citeR}, to simulate, download, clean and test the data, and create the model. More information on packages and specific methods is included later in the paper. This paper is structured as follows: The Data Section @ref introduces the data sets, their variables and how they were tailored to obtain the needed information. The Model section discusses in greater detail the structure of both models and what information they convey. The results and analysis of the models and discussed in the Results section. Lastly, the Discussion section discusses real-life implications from the findings of this paper, limitations faced and next steps.
+This paper uses the R Programming Language {@citeR}, to simulate, download, clean and test the data, and create the model. More information on packages and specific methods is included later in the paper. This paper is structured as follows: The Data Section [@paper-data-section] introduces the data sets, their variables and how they were tailored to obtain the needed information. The Model section discusses in greater detail the structure of both models and what information they convey. The results and analysis of the models and discussed in the Results section. Lastly, the Discussion section discusses real-life implications from the findings of this paper, limitations faced and next steps.
 
-# Data Section {#paper-data-section}
+# Data Section [#paper-data-section]
 
-This pap
+This paper uses R [@citeR], and the `tidyverse` [@citetidyverse], `janitor` [@citejanitor], `ggplot` [@citeggplot], `arrow` [@citearrow], `dplyr` [@R-dplyr] packages throughout the analysis to clean both data sets and create visualizations. `nnet` [@R-nnet] is employed to fit and apply the models.
 
-### The difference between an underweight and normal person:
-Let us take a closer look at the BMI levels below 25 for underweight and normal weight adults.
-
+The primary motivator of this paper was the diverse body compositions that were classified under the same BMI category. The graph [@tbl-bmi-cats-bf] shows the diverse values of Body Fat Percentages classified in the same BMI category.
 ```{r}
 #| warning: false
 #| message: false
 #| echo: false
-body_mass_data_raw <- read_parquet("../data/raw_data/body_mass_data.parquet")
-body_mass_clean <- body_mass_data_raw %>%
-  clean_names() %>%
-  select(gender_m1f2, age, height_cm, w_kg, bmi, fat_mass_kg, fm, ffm_kg, bone_mass_kg, muscle_mass_kg) %>%
-  mutate(
-    bmi_category = case_when(
-      bmi < 18.5 ~ "Underweight",
-      bmi >= 18.5 & bmi <= 24.9 ~ "Normal weight",
-      bmi >= 25.0 & bmi <= 29.9 ~ "Overweight",
-      bmi >= 30.0 & bmi <= 34.9 ~ "Obese - Class I",
-      bmi >= 35.0 & bmi <= 39.9 ~ "Obese - Class II",
-      bmi >= 40.0 ~ "Obese - Class III"
-    ))
-```
- Part 1: What is the difference between an underweight / athletic person / 
+#| label: fig-bmi-cats-bf
+#| tbl-cap: "BMI vs. Fat Mass by BMI Category"
 
-### All categories
-```{r}
-#| warning: false
-#| message: false
-#| echo: false
-
-# this is what i chose
 ggplot(body_mass_model, aes(x = bmi, y = fm)) +
   geom_point(aes(color = bmi_category), alpha = 0.7) +
   geom_vline(xintercept = c(18.5, 25, 30), linetype = "dashed", color = "black", linewidth = 0.5, alpha = 0.5) +
@@ -106,44 +84,34 @@ ggplot(body_mass_model, aes(x = bmi, y = fm)) +
 ```
 
 
-
-A new way of estimating general body health is to use WHR. This ratio aims to capture the excess fat deposit in a person's abdominal area which is were most people store adipose fat. A high WHR indicates high levels of fat. However, this is not enough. This is simply the most effective way of identyfing the most obvious and dangerous place of fat accumulation.
-
-
-
-
 # Data {#sec-data}
 
 ## Overview
 #### General Statement
-- [is this data observational or sample] The data used for this paper has two different sources and serve two different purpose. The first dataset considered is the BodyM dataset from Amazon Web Services (AWS) [ref]. This dataset serves as the training data for the model to predict the category of fat in a person. This dataset also included silhouettes to capture accurate body compositions of real test subjects. [the purpose of this]. This data was collected to support the estimation of bodily measurements using Machine Learning [reference]. The silhouettes are not being used for the purposes of this paper.
-- [is this data observational or sample] The second dataset is the Body Fat Distribution distribution collected for estimating a new body fat measurement technique by Isaac Kuzmar Et Al. [reference]. For the purposes of this paper, this dataset would be refered to as the Body Compositon dataset as it used to calculate fat percentages based on actual body composition. It serves as a comparision for the model’s predictions.
+The data used in this paper comes from two distinct sources, each serving a specific purpose:
 
-### BodyM Dataset - AWS Marketplace for Open Data [fix this heading]
-The BodyM Dataset, refered to teh Body Measurements dataset throughout this paper, was collected for [Ruiz2022] Ruiz Et Al. in their paper with a focus on underrepresented body types in estimation of fat and its susbquent health risks. The main data captured from this collection was the front and lateral silhouttes of [2000something] test subjects. These silhouttes were then converted to black and white images to be used by their augementation model. The subjects include X male and Y female aged A to B. The body measurements in this dataset were generated through their adversarial body simulator (ABS). The ABS was specifically modeled to capture underrespresented body types. The S3 [reference] package included 3 datasets: training, Test A and Test B. This paper uses the training dataset. The visual images of test subjects were photographed and 3D-scanned by lab technicians.
-- Tibble of this dataset after cleaning:
 
-```{r}
-# measurements_tibble <- as_tibble(cleaned_data_model)
-# kable(measurements_tibble, caption = "Example Tibble Output")
-```
 
+2. **Body Composition Dataset**  
+This dataset, referred to as the Body Composition dataset for the purposes of this paper, was collected for estimating a new body fat measurement technique by Isaac Kuzmar et al. [@Kuzmar2020]. It is used to calculate fat percentages based on actual body composition and serves as a comparison for the model’s predictions.
+
+1. **BodyM Dataset**  
+   This dataset, obtained from Amazon Web Services (AWS) [@AWS_Bodym], is used as training data for the model to predict body fat categories. It includes silhouettes of real test subjects to capture accurate body compositions. These silhouettes were collected to support the estimation of bodily measurements using Machine Learning techniques. However, the silhouettes are not used in this paper.
+   
+The BodyM Dataset, referred to as the Body Measurements dataset throughout this paper, was collected by Ruiz et al. [@Ruiz2022] with a focus on underrepresented body types in the estimation of fat and its subsequent health risks. The primary data captured in this collection consists of the front and lateral silhouettes of approximately [2000] test subjects. These silhouettes were then converted into black-and-white images for use in their augmentation model. The dataset includes X male and Y female subjects, aged A to B. The body measurements in this dataset were generated using their Adversarial Body Simulator (ABS), which was specifically designed to capture underrepresented body types. The S3 package [@reference] included three datasets: Training, Test A, and Test B. For the purposes of this paper, only the Training dataset is used. The visual images of the test subjects were photographed and 3D-scanned by lab technicians.
 
 #### The variables of my use:
 
-For this paper, this dataset is used to estimate the category of body fat that a person carries. To effectively differentiate the different body types, the model considers measurements that could indicate actual body compositions. I chose gender, height and weight and basic predictors for the model. However, according to [reference, WHO], waist-to-hip ratio is more accurate to predict levels of body fat in a person. Based on [reference], the two sexes have different tendencies of excess body fat collection also known as [adipose fat]. In males, excess body fat tends to collect in the abdominal region, whereas in females, fat collects in the hips. This ratio is indicative of fat accumulation and a higher ratio can be used as a precursor indicator for obesity [reference]. 
+For this paper, the BodyM Dataset is used to estimate the category of body fat that a person carries. To effectively differentiate between the various body types, the model takes into account measurements that could indicate actual body compositions. Gender, height, and weight are used as basic predictors for the model. However, according to [@reference, WHO], the waist-to-hip ratio (WHR) is a more accurate predictor of body fat levels. Based on [@reference], the two sexes exhibit different tendencies for excess body fat accumulation, also known as adipose fat. In males, excess fat tends to accumulate in the abdominal region, whereas in females, fat is more commonly stored in the hips. This ratio is indicative of fat distribution, and a higher WHR can be a precursor indicator of obesity [@reference].
 
-To consider body composition along the height of a person, a new variable called height-to-hip ratio, height_hip_ratio, was created. [referernce], something like two people with the same WHR could differ in the fat category that they belong to depending on the height. A tall person with a higher WHR is at a lower risk of developing cardiovascular risks than a shorter person with the same height [reference].
+To better account for body composition in relation to height, a new variable called height-to-hip ratio (height_hip_ratio) was introduced. As noted by [@reference], two individuals with the same WHR could differ in their fat category depending on height. For instance, a taller person with a higher WHR may face a lower risk of developing cardiovascular issues than a shorter person with the same WHR [@reference].
 
-Lastly, to improve the quality of the model, I also selected ankle and wrist circumference measurements. [reference], [this is important for boundary values].
+Finally, to enhance the model’s quality, ankle and wrist circumference measurements were also included. These measurements are particularly important for determining boundary values for fat classification [@reference].
 
-- include a table for WHR and who’s statement
+#### The estimand for the models
 
-#### The estimand for the model
+Both models employ `fat_percentage_category` as their independent variable or estimand. The reason for chosing a category over an actual value was the difference in predictors across the two models. Both models use different predictors to estimate `fat_percentage_category` so in order to produce useful comparisons against common predictors such as sex, height and weight, I used a categorical variable.
 
-The estimand for the model, fat_percentage_category, is created using WHR as a proxy initially. It is calculated based on the subjects gender and WHR as males and females have different fat accumulation patters. The ratio intervels for these categories was derived from []. The model then predicts a more accurate fat percentage category based on other predictors.
-
-- visualisations.
 
 ```{r}
 #| echo: false
@@ -419,32 +387,10 @@ Use sub-sub-headings for each outcome variable and feel free to combine a few in
 
 # Model
 
-The goal of our modelling strategy is twofold. Firstly,...
+I aimed to provide a categorization of body fat levels in an individual based on simple measurements. By using measurements such as height, weight, waist-to-hip ratio (WHR), and ankle and wrist circumference, I sought to capture a person’s body composition as accurately as possible. I expected a positive relationship between excess body fat levels and WHR. Additionally, height is an important factor to consider in capturing fat distribution—specifically, a shorter person with a high WHR would be at a higher risk of obesity-related diseases.
 
-Here we briefly describe the Bayesian analysis model used to investigate... Background details and diagnostics are included in [Appendix -@sec-model-details].
-
-- multinomial logistic regression because we are predicting multiple categories
-
-## Model set-up
-
-Define $y_i$ as the number of seconds that the plane remained aloft. Then $\beta_i$ is the wing width and $\gamma_i$ is the wing length, both measured in millimeters.  
-
-\begin{align} 
-y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
-\mu_i &= \alpha + \beta_i + \gamma_i\\
-\alpha &\sim \mbox{Normal}(0, 2.5) \\
-\beta &\sim \mbox{Normal}(0, 2.5) \\
-\gamma &\sim \mbox{Normal}(0, 2.5) \\
-\sigma &\sim \mbox{Exponential}(1)
-\end{align}
-
-We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
-
-
-### Model justification
-- I wanted to provide a categorisation of fat levels in an indivual based on simple measurements. Using measurements such as height and weight that are used in the formula and WHR and ankle and wrist measurements, I wanted to capture a person's body compositon as much as possible. i expected that there is a positve relationship between a person's excess body fat levels and their WHR. In addition to WHR, the height if a person is also important to capture the distribution of fat, a short person with a high WHR would be at a higher risk of obesity related diseases.
-- men are more likely to collect fat in their abdomen area and women in their hip area. To capture nature body shapes and leanness, i also considered....
-
+Men are more likely to accumulate fat in the abdominal region, while women tend to store fat in the hip area. To capture natural body shapes and leanness, I also considered other factors that influence body composition, such as height-hip ratio that would capture the distribution of fat
+.
 ## Model General Overview:
 
 This paper uses 2 models to model the two datasets. The first model, the Body Measurements Model, would be used to predict fat percetage categories using the measurements of person’s body that can be obtained using a measuring tape. The second model, the Body Composition Model, is also designed to access the relation between different bodiliy compositions such as total body weight, excess fat weight, lean muscle mass in kilograms.
@@ -496,15 +442,26 @@ Limitations:
 
 ### Model 2:
 
-In this model, the dependent variable is fat_percentage_category. The model is set up as follows
+The model fits a multinomial logistic regression model to predict the fat percentage category (`fat_percentage_category`) based on the following predictors:
 
-- fat_percentage_category = beta_0 + beta_1() + beta_() + beta_() + beta_()
+- `height` (a continuous variable representing the individual's height),
+- `gender` (a categorical variable representing the individual's gender),
+- `fm` (a continuous variable representing fat mass or a related measure).
 
-where
+The model is defined as follows:
 
-- fatmass:
-- weight:
-- height_hip_ratio
+\begin{align}
+P(Y = k \mid X_1, X_2, X_3) = \frac{e^{\beta_{0k} + \beta_{1k} X_1 + \beta_{2k} X_2 + \beta_{3k} X_3}}{1 + \sum_{m=1}^{K-1} e^{\beta_{0m} + \beta_{1m} X_1 + \beta_{2m} X_2 + \beta_{3m} X_3}}
+\end{align}
+
+Where:
+
+- \( P(Y = k \mid X_1, X_2, X_3) \) is the probability of observing the \( k \)-th category of `fat_percentage_category` given the values of `height` (\( X_1 \)), `gender` (\( X_2 \)), and `fm` (\( X_3 \)).
+- \( \beta_{0k}, \beta_{1k}, \beta_{2k}, \beta_{3k} \) are the estimated coefficients for each category \( k \) of the outcome variable, where the reference category is typically set to 0.
+- \( K \) is the total number of categories in the dependent variable `fat_percentage_category`.
+
+This model allows us to assess the relationship between the categorical outcome (`fat_percentage_category`) and the continuous and categorical predictors (`height`, `gender`, `fm`), estimating the probabilities for each category of fat percentage based on the input predictors.
+
 
 ### Model Justification
 
@@ -579,6 +536,10 @@ The negative intercepts indicate that in the absence of any predictors, the mode
 ## Predictions based body circumferences overgeneralize the population
 
 ```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
 
 # measurements_results <- cleaned_data_model %>%
 #   select(gender, height, weight, height_category, fat_percentage_category, predicted_category) %>%
@@ -676,6 +637,10 @@ The primary shortfall of the BMI categories was that it failed to differententia
 
 ## What BMI fails to capture
 ```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
 
   # Function to categorize weight
   

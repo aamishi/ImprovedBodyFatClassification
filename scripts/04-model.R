@@ -10,7 +10,6 @@
 library(tidyverse)
 library(rstanarm)
 library(nnet)
-library(randomForest)
 library(tidyr)
 
 #### Read data ####
