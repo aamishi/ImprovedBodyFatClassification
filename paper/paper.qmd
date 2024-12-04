@@ -30,14 +30,10 @@ body_mass_model <- read_parquet(file = here::here("data/analysis_data/body_mass_
 ```
 
 
-# Introduction
+# Introduction {#paper-intro}
 
-BMI is a common indicator for general health but it has its limitations. It does not take into consideration the actual body composition of an individual and other important factors such as sex and age. Through this paper, I would like to propose a new way categorising people based on other body measurements such as the waist-to-hip ratio and wrist and ankle circumferences measurements as they are more indicative of a person's visceral fat, this proving a more accurate representation of general health. I would like to propose a newer formula for General Health Index (GHI) through the BodyM dataset. I plan on using the Isaac Kuzmar dataset that has accurate measurements of body fat to create a Confusion Matrix to see how my model compares in providing more accurate body fat estimations through easlily measurable data such as waist and hip circumference.
+BMI is a common indicator for general health but it has its limitations. It does not take into consideration the actual body composition of an individual and other important factors such as sex and age. In its initial design, BMI was designed using only male [] subjects and thus cannot be applied to females. Due to its inability to capture body composition, a lot of false positives and false negatives are produced. Through this paper, I would like to compare how using the Waist-to-Hip Ratio (WHR) serves as a more accurate way of estimating your body fat levels at home. The inspiration for using the WHR stems from fat accumulation patterns and distribution of fat vertically. This also helps us further differentiate between closer classifications of BMI such as Underweight and Normal Categories and Overweight and Obese Categories. BMI is notorious for classifications. A popular example of this would be body builders being classfied as Overweight according to BMI despite having lower levels for body fat and being at a lower risk of obesity health risks. On the other had, taller people are often excused as false negatives and are failed to be recognized as having higher body fat levels due to their height. The table {} below includes the BMI categories as endorsed by the Government of Canada.
 
-
-- this paper uses 2 datasets to capture the difference in fat assessment for popular methods. BMI is a popular way of estimating health issues in an individual but it fails to capture details like body composition. In its initial design, BMI was designed using only male [] subjects and thus cannot be applied to females. However, due to excess popularity, it is used as a self-assessment to estimate your body composition and health risks. However, due to its inability to capture body composition, a lot of false positives and false negatives are produced. These indivuals often identify health risks [] later in the onset. My aim with this paper is to introduce simple measurements that can be recorded at home and help indivuals recognise when they should seek mdeical attention.
-
-## BMI Classification:
 ```{r}
 #| warning: false
 #| message: false
@@ -54,6 +50,18 @@ knitr::kable(
   caption = "BMI Categories as per the Government of Canada Guidelines"
 )
 ```
+
+The second prong of this paper is finding the relation between age, height and weight against actual body fat that is separate from a person's total body weight. This serves as a comparison between the classification of body fat levels based on physical measurements versus more anabolic storage of fat. Actual body fat is estimated using several methods such as skinfold calipers or DEXA {} scans. Both of these methods require professionals to record and experts to decipher. It is unusual for common folk to opt for these methods without medication intervention or expert domain knowledge such as athletic coaches. 
+
+Through this paper, I analyse how common factors such as sex, height and weight compare against WHR and Body Scan classifications and how imporant are the main predictors for the respective models. I employ two multilevel logistical regression models to categorize people based primarily on the WHR and Body Fat Percentages. The paper follows a two pronged approach using two different data sets that estimate the classification in two separate ways. I then compare their accuracy against their respective data set.
+
+It is a known fact that BMI generalizes several body types based only on height and weight considerations. However, through the work of this paper, it can be noted that High and Extreme levels of body fat are completely disregarded through WHR calculations. Both data sets and models show an increasing trend in body fat levels as weight increases. The model on measurements data predicts a smooth increase of body fat as a person's weight increases. However, the model based on body compositions predicts a steeper increase in body fat as a person's weight increases. This fact is more obvious when data is faceted by sex.
+
+This paper uses the R Programming Language {@citeR}, to simulate, download, clean and test the data, and create the model. More information on packages and specific methods is included later in the paper. This paper is structured as follows: The Data Section @ref introduces the data sets, their variables and how they were tailored to obtain the needed information. The Model section discusses in greater detail the structure of both models and what information they convey. The results and analysis of the models and discussed in the Results section. Lastly, the Discussion section discusses real-life implications from the findings of this paper, limitations faced and next steps.
+
+# Data Section {#paper-data-section}
+
+This pap
 
 ### The difference between an underweight and normal person:
 Let us take a closer look at the BMI levels below 25 for underweight and normal weight adults.
@@ -76,7 +84,7 @@ body_mass_clean <- body_mass_data_raw %>%
       bmi >= 40.0 ~ "Obese - Class III"
     ))
 ```
-# Data Section: Part 1: What is the difference between an underweight / athletic person / 
+ Part 1: What is the difference between an underweight / athletic person / 
 
 ### All categories
 ```{r}

@@ -1,5 +1,5 @@
 #### Preamble ####
-# Purpose: Tests Body Composition data
+# Purpose: Tests Measurements (BodyM) data
 # Author: Aamishi Avarsekar
 # Date: 3rd December 2024
 # Contact: aamishi.avarsekar@mail.utoronto.ca
