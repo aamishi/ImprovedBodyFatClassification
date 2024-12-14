@@ -61,7 +61,7 @@ cleaned_data <- combined_data %>%
   # mutate(fat_percentage_category = mapply(categorize_bfp, bmi_category)) %>%
   mutate(fat_percentage_category = factor(
     mapply(categorize_bfp, bmi_category),
-    levels = c("Low", "Moderate", "High", "Extreme") 
+    levels = c("Moderate", "Low", "High", "Extreme") 
   )) %>%
   mutate( # This part was written with the help of ChatGPT
     height_category = cut(
@@ -72,6 +72,7 @@ cleaned_data <- combined_data %>%
       right = FALSE  # Make intervals left-closed, so 150 goes into the "150-160" range
     )
   )
+
 
 #### Save data ####
 write_parquet(cleaned_data, "data/analysis_data/measurements_analysis_data.parquet")

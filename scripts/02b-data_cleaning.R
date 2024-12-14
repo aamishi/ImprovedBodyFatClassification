@@ -79,7 +79,7 @@ body_mass_clean <- body_mass_data_raw %>%
   # mutate(fat_percentage_category = mapply(assign_fat_category, gender, age, fm)) %>%
   mutate(fat_percentage_category = factor(
     mapply(assign_fat_category, gender, age, fm),
-    levels = c("Low", "Moderate", "High", "Extreme") 
+    levels = c("Moderate", "Low", "High", "Extreme") 
   )) %>%
   mutate(
     height_category = cut(
