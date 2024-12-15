@@ -39,7 +39,7 @@ BMI is a common indicator for general health but it has its limitations. It does
 #| message: false
 #| echo: false
 #| label: tbl-gov-can-bmi
-#| tbl-cap: "BMI vs. Fat Mass by BMI Category"
+#| tbl-cap: "BMI Categories as per the Government of Canada Guidelines"
 bmi_canada_gov <- data.frame(
   Category = c("Underweight", "Normal weight", "Overweight", "Obese - Class I", "Obese - Class II", "Obese - Class III"),
   `BMI Range` = c("Below 18.5", "18.5–24.9", "25.0–29.9", "30.0–34.9", "35.0–39.9", "40.0 and above")
@@ -48,8 +48,7 @@ bmi_canada_gov <- data.frame(
 # Create a table using knitr::kable
 knitr::kable(
   bmi_canada_gov,
-  col.names = c("Category", "BMI Range"),
-  caption = "BMI Categories as per the Government of Canada Guidelines"
+  col.names = c("Category", "BMI Range")
 )
 ```
 
@@ -90,7 +89,7 @@ ggplot(body_mass_model, aes(x = bmi, y = fm)) +
 
 This dataset, obtained from Amazon Web Services (AWS) [@AWS_Bodym], is used as training data for the model to predict body fat categories. It includes silhouettes of real test subjects to capture accurate body compositions. These silhouettes were collected to support the estimation of bodily measurements using Machine Learning techniques. However, the silhouettes are not used in this paper.
 
-The BodyM Data Set, referred to as the Body Measurements data set throughout this paper, was collected by Ruiz et al. [@Ruiz2022] with a focus on underrepresented body types in the estimation of fat and its subsequent health risks. The primary data captured in this collection consists of the front and lateral silhouettes of approximately \[TODO\] test subjects. These silhouettes were then converted into black-and-white images for use in their augmentation model. The data set includes TODO male and TODO female subjects, aged TODO to TODO The body measurements in this data set were generated using their Adversarial Body Simulator (ABS), which was specifically designed to capture underrepresented body types. The S3 package  included three datasets: Training, Test A, and Test B. For the purposes of this paper, only the Training data set is used. The visual images of the test subjects were photographed and 3D-scanned by lab technicians.
+The BodyM Data Set, referred to as the Body Measurements data set throughout this paper, was collected by Ruiz et al. [@Ruiz2022] with a focus on underrepresented body types in the estimation of fat and its subsequent health risks. The primary data captured in this collection consists of the front and lateral silhouettes of 2,779 test subjects. These silhouettes were then converted into black-and-white images for use in their augmentation model. The body measurements in this data set were generated using their Adversarial Body Simulator (ABS), which was specifically designed to capture underrepresented body types. The S3 package  included three data sets: Training, Test A, and Test B. For the purposes of this paper, only the Training data set is used. The visual images of the test subjects were photographed and 3D-scanned by lab technicians.
 
 ### The variables of my use:
 
@@ -284,9 +283,7 @@ The figures: @fig-bmi-2-gender, @fig-prop-fm-ht-wt and @fig-prop-smoothed-bmi gr
 
 
 ### Measurement of Data
-Height in centimeters and fat mass values were obtained using the Tanita MC-780MA medical equipment.
-
-\newpage
+Medical records obtained through medical–nutritional consultations of BiomediKcal–Advanced Medical Nutrition & Lifestyle Center of Barranquilla were used to construct this data set. Height in centimeters and fat mass values were obtained using the Tanita MC-780MA medical equipment.
 
 # Models
 
@@ -639,7 +636,7 @@ ggplot(category_proportions, aes(x = height_category, y = percentage, fill = pre
    theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels
 ```
 
-Building on the previous point of BMI failing to correctly capture physical attributes of body composition, this graph emphasises how the Moderate Category is persistently overclassiffied across height groups. In the Measurements Model graph, all height groups share similar proportions of Fat Category classifications. More than 50% of the people below 170CM and slightly less than 50% people taller than 170CM are classified as Normal Fat Category. However, this overclassication is debunked by the Body Composition Model Graph as almost all of the height classes have a major classification in the Normal category. In fact, height classes above 160CM have a collective proportion of greater than 75% for High and Extreme fat levels. As the Body Composition Model specifically disregards weight holistically and considers pure fat only, we can see that tall people have an increased chance of being classified as Normal fat category. Subsequent health risk identifications are delayed for these groups of people and is later discussed in greater detail \[here todo.\] Additionally, following the original BMI formula, taller people are at advantage as their weight is spread further along their height. However, the difference in proportions of the classifications across both models highlights this specific downfall of the BMI formula.
+Building on the previous point of BMI failing to correctly capture physical attributes of body composition, this graph emphasises how the Moderate Category is persistently overclassiffied across height groups. In the Measurements Model graph, all height groups share similar proportions of Fat Category classifications. More than 50% of the people below 170CM and slightly less than 50% people taller than 170CM are classified as Normal Fat Category. However, this overclassication is debunked by the Body Composition Model Graph as almost all of the height classes have a major classification in the Normal category. In fact, height classes above 160CM have a collective proportion of greater than 75% for High and Extreme fat levels. As the Body Composition Model specifically disregards weight holistically and considers pure fat only, we can see that tall people have an increased chance of being classified as Normal fat category. Subsequent health risk identifications are delayed for these groups of people and is later discussed in greater detail. Additionally, following the original BMI formula, taller people are at advantage as their weight is spread further along their height. However, the difference in proportions of the classifications across both models highlights this specific downfall of the BMI formula.
 
 ## Difference in Gender Performance
 
@@ -684,29 +681,55 @@ It also maybe understood that WHR shows a better performance for certain demogra
 
 ## What should athletes use?
 
-BMI is a crude way of classifying people. Athletes are especially at risk at being mis-classified despite a lower body mass weight but a higher muscle mass. According to \[\], Athletes have
-
-Please don't use these as sub-heading labels - change them to be what your point actually is.
+BMI is a crude way of classifying people. Athletes are especially at risk at being mis-classified despite a lower body mass weight but a higher muscle mass. 
 
 ## Weaknesses and next steps {#sec-weaknesses-point}
 
--   the BodyM dataset does not include age. An older person has lower metabolism \[\] and a higher chance of collecting fat on their abdomen.
+Neither of the dataset include children and cannot be applied to anyone under the age of 18. It is important to consider age as a primary factor while diagnosing any medical condition. Additionally, fat deposits affect different age demographics differently. For example, an obese child can develop early symptoms of adult obesity if not corrected in the younger years. Likewise, menopausal women face hormonal changes that cause increased abdominal obesity (@Davis2012). Information such as pregnancy status should also be considered if WHR is to be introduced as a replacement for BMI in clinical settings.
 
-Weaknesses and next steps should also be included.
+My models are recorded for ethically different groups of people. While the AWS BodyM Data Set is collected for a varied group of ethnicity, the Body Composition data set is specifically collected only in Barranquilla, Columbia. The way humans across different races store and respond to excess fat is also largely different [@Deurenberg1998]. Hence, the models should have accounted for potential confounders that could arise due to enthicity. Furthermore, the models does not consider the difference in data sizes. While I did use proportions as much as possible, the data sets are skewed in slightly different directions. Both datasets have low representation for Underweight (by BMI) people. More analysis can be done in this regard to adjust for the lack of representation. The above factors make the data sets not precisely comparable.
 
+A suitable next step for this research paper would be to include age and other demographic details such as lifestyle category. Additional information about a person's lifestyle could further improve the diagnosis of any obesity related disease. It would also be significant to include whether the specific ethnic information of a person or to use data set from the same geographical location. 
+
+Lastly, the models can improve the proxies for `fat_percentage_category` by studying current literature on the relationship between BMI and fat percentage. The model bases the categories based on the existances of similar trends without taking into consideration any adjustment factors. 
 \newpage
 
 \appendix
 
-# Appendix {.unnumbered}
+# Appendix {#sec-model-details}
 
-# Additional data details
+## Model Verification
 
-# Models Validation {#sec-model-details}
+Both models were considerd due to their high accuracy which is shown in [@tbl-accuracy]. Inclusion of weight and fat free mass, respectively, caused a higher accuracy but I suspect it is because of over-fitting of data. 
 
-## Posterior predictive check
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+#| label: tbl-accuracy
+#| tbl-cap: "Accuracy of Models"
+# Predicted probabilities for each category
+accuracy_1 <- mean(cleaned_data_model$predicted_category == cleaned_data_model$fat_percentage_category)
 
-we compare the posterior with the prior. This shows...
+accuracy_2 <- mean(body_mass_model$predicted_category == body_mass_model$fat_percentage_category)
+
+accuracy_table <- data.frame(
+  Model = c("Measurements Model", "Body Mass Model"),
+  Accuracy = c(accuracy_1*100, accuracy_2*100)
+)
+
+# Generate a table in Quarto
+kable(accuracy_table)
+
+```
+
+
+## Surveys, sampling, and observational data
+
+To establish a more causational relationship between anthropocentric measurements and actual fat mass to indicate obesity, we can set up an interview based study. This would include interviewing the test subjects about their lifestyle, their fitness levels, additional hormonal fluctuations such as pregnancy or menopause. This would provide us more information to be able to differentiate between the circumference measurement. We could also interview the subjects about their ethnicity, age and if they currently have any metabolism enhancing or reducing treatments. 
+
+This interview would provide the base for a more detailed comparative analysis of the establishment of bodily measurements and its correlation with body fat. The same set of people can be recorded for their anthropocentric measurements as well as body composition measurement. It would then make the results of the study more directly application to conclude a relationship.
 
 ```{r}
 #| eval: true

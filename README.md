@@ -35,4 +35,4 @@ The repo is structured as:
 
 ## Statement on LLM usage
 
-Several aspects of this paper were completed using the help of ChatGPT 4.0 and 4.0 Mini. Most notably, it was used to create tests and visualizations and understand statistics concepts. The conversations between ChatGPT are shared in the usage/ folder.
+Several aspects of this paper were completed using the help of ChatGPT 4.0 and 4.0 Mini. Most notably, it was used to create tests, visualizations, and .bib references and understand statistics concepts. The conversations between ChatGPT are shared in the usage/ folder.
