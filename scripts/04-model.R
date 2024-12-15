@@ -26,7 +26,7 @@ cleaned_data_model$predicted_category <- predict(measurements_model, newdata = c
 body_mass_model_bmi <- multinom(fat_percentage_category ~ age + height + gender + fm, data = body_mass_model)
 body_mass_model$predicted_category <- predict(body_mass_model_bmi, newdata = body_mass_model)
 
-summary(measurements_model)
+summary(body_mass_model_bmi)
 
 #### Save model ####
 write_parquet(cleaned_data_model, "data/analysis_data/measurements_analysis_data.parquet")

@@ -66,7 +66,7 @@ body_mass_clean <- body_mass_data_raw %>%
   mutate(
     bmi_category = case_when(
       bmi < 18.5 ~ "Underweight",
-      bmi >= 18.5 & bmi <= 24.9 ~ "Moderate",
+      bmi >= 18.5 & bmi <= 24.9 ~ "Normal",
       bmi >= 25.0 & bmi <= 29.9 ~ "Overweight",
       bmi >= 30.0 ~ "Obese"
     )) %>%
