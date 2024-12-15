@@ -59,7 +59,7 @@ Through this paper, I analyse how common factors such as sex, height and weight 
 
 It is a known fact that BMI generalizes several body types based only on height and weight considerations. However, through the work of this paper, it can be noted that High and Extreme levels of body fat are completely disregarded through WHR calculations. Both data sets and models show an increasing trend in body fat levels as weight increases. The model on measurements data predicts a smooth increase of body fat as a person's weight increases. However, the model based on body compositions predicts a steeper increase in body fat as a person's weight increases. This fact is more obvious when data is faceted by sex.
 
-This paper uses @citeR, to simulate, download, clean and test the data, and create the model. More information on packages and specific methods is included later in the paper. This paper is structured as follows: The \[Data Section\](@paper-data-section) introduces the data sets, their variables and how they were tailored to obtain the needed information. The Model section discusses in greater detail the structure of both models and what information they convey. The results and analysis of the models and discussed in the Results section. Lastly, the Discussion section discusses real-life implications from the findings of this paper, limitations faced and next steps.
+This paper uses @citeR, to simulate, download, clean and test the data, and create the model. More information on packages and specific methods is included later in the paper. This paper is structured as follows: The Data Section introduces the data sets, their variables and how they were tailored to obtain the needed information. The Model section discusses in greater detail the structure of both models and what information they convey. The results and analysis of the models and discussed in the Results section. Lastly, the Discussion section discusses real-life implications from the findings of this paper, limitations faced and next steps.
 
 # Data Section {#paper-data-section}
 
@@ -90,34 +90,29 @@ ggplot(body_mass_model, aes(x = bmi, y = fm)) +
 
 This dataset, obtained from Amazon Web Services (AWS) [@AWS_Bodym], is used as training data for the model to predict body fat categories. It includes silhouettes of real test subjects to capture accurate body compositions. These silhouettes were collected to support the estimation of bodily measurements using Machine Learning techniques. However, the silhouettes are not used in this paper.
 
-The BodyM Data Set, referred to as the Body Measurements data set throughout this paper, was collected by Ruiz et al. [@Ruiz2022] with a focus on underrepresented body types in the estimation of fat and its subsequent health risks. The primary data captured in this collection consists of the front and lateral silhouettes of approximately \[2000\] test subjects. These silhouettes were then converted into black-and-white images for use in their augmentation model. The data set includes X male and Y female subjects, aged A to B. The body measurements in this data set were generated using their Adversarial Body Simulator (ABS), which was specifically designed to capture underrepresented body types. The S3 package [@reference] included three datasets: Training, Test A, and Test B. For the purposes of this paper, only the Training data set is used. The visual images of the test subjects were photographed and 3D-scanned by lab technicians.
+The BodyM Data Set, referred to as the Body Measurements data set throughout this paper, was collected by Ruiz et al. [@Ruiz2022] with a focus on underrepresented body types in the estimation of fat and its subsequent health risks. The primary data captured in this collection consists of the front and lateral silhouettes of approximately \[TODO\] test subjects. These silhouettes were then converted into black-and-white images for use in their augmentation model. The data set includes TODO male and TODO female subjects, aged TODO to TODO The body measurements in this data set were generated using their Adversarial Body Simulator (ABS), which was specifically designed to capture underrepresented body types. The S3 package  included three datasets: Training, Test A, and Test B. For the purposes of this paper, only the Training data set is used. The visual images of the test subjects were photographed and 3D-scanned by lab technicians.
 
 ### The variables of my use:
 
-For this paper, the BodyM Dataset is used to estimate the category of body fat that a person carries using circumference measurements. This means the circumferential length of body parts such as the waist and the hips. To build the model, I chose standard predictors such as gender, height and the weight of subjects as the base predictors. However, these predictors are not effective at differentiating body types. Therefore, to effectively construct the distribution of body fat in human body only through measurements, I created two variables called `waist_hip_ration` and `height_hip_ratio`. These variables are used to model the differences in the lateral and horizontal fat distributions. According to WHO [@reference], the waist-to-hip ratio, WHR, is a more accurate predictor of body fat around the abdominal area. Based on the study done in [@reference], the two sexes exhitbit difference tendenices for excess body fat accumulation, also known as the adipose fat. In males, excess fat tends to accumulate in the abdominal region, whereas in females, fat is more commonly stored in the hips. This ratio is indicative of fat distribution, and a higher WHR can be a precursing indicator of obesity [@reference]. In the study done in \[place\], it is shown that an increase in height lowers the decreases the probability of being classified into a higher BMI category for both genders. Finally, to enhance the model’s quality, ankle and wrist circumference measurements were also included. These measurements are particularly important for determining boundary values for fat classification [@reference]. Excess fat accumulation at the wrists and ankles could indicate other health risks as seen in \[\].
+For this paper, the BodyM Dataset is used to estimate the category of body fat that a person carries using circumference measurements. This means the circumferential length of body parts such as the waist and the hips. To build the model, I chose standard predictors such as gender, height and the weight of subjects as the base predictors. However, these predictors are not effective at differentiating body types. Therefore, to effectively construct the distribution of body fat in human body only through measurements, I created two variables called `waist_hip_ratio` and `height_hip_ratio`. These variables are used to model the differences in the lateral and horizontal fat distributions. According to WHO [@WHO2008], the waist-to-hip ratio, WHR, is a more accurate predictor of body fat around the abdominal area. Based on the study done in [@Wells2012], the two sexes exhibit difference tendencies for excess body fat accumulation, also known as the adipose fat. In males, excess fat tends to accumulate in the abdominal region, whereas in females, fat is more commonly stored in the hips. This ratio is indicative of fat distribution, and a higher WHR can be a precursing indicator of obesity. In the study, it is shown that an increase in height lowers the decreases the probability of being classified into a higher BMI category for both genders. Finally, to enhance the model’s quality, ankle and wrist circumference measurements were also included. These measurements are particularly important for determining boundary values for fat classification [@Mitchell1993]. Excess fat accumulation at the wrists and ankles could indicate other health risks.
 
-### The estimand for the model
-
-Using the above predictor variables, I contructed the variable `fat_percentage_category` as I recruit a multilevel linear regression model to classify the body fat. Initially, I wanted to predict the actual fat percentage, but this proved difficult as ... I decided to use a categorical variable as the estimand to produced useful comparisons against other categorical variables such as sex, height categories and weight categories. Additionally, `fat_percentage_category` was constructed using BMI as a proxy to gauge fat levels in a person. BMI is still widely used in medical scenarios to provide general diagnosis of health levels so I used that as a base to study the interactions between current systems and new offerings of WHR and height_hip_ratio. The relationship between `fat_percentage_category` and BMI was considered to be relatively straightforward to mimick the nature of the current applications of BMI. For BMI, I chose to consider the categories, `underweight`, `normal`, `overweight` and `obese`. These were calulated using the BMI formula: \[insert BMI formula on a new line\].
-
-No difference between the genders was considered. Obesity categories using BMI consists of Obese I, Obese II and Obese III as they cause the increasing obesity relating such as diabetes, \[ii\] and \[iii\]. However, due to the lack of data points for Obesity II and III (BMI X - X), I chose to categorize all levels of obesity within the same `obesity` category.
-
-The following table shows the relationship between the new `fat_percentage_category` against existing the `bmi_category`.
+The figures: @fig-prop-bmi-gender, @fig-prop-whr-gender and @fig-prop-hhr-gender show the graphs for the dataset's proportion for BMI for each gender as well as the Ankle and Wrist Measurements in @fig-prop-ankle-wrist.
 
 ```{r}
 #| echo: false
 #| eval: true
 #| warning: false
 #| message: false
+#| label: fig-prop-bmi-gender
+#| fig-cap: "Proportions of BMI Categories by Gender"
 
 cleaned_data_model$bmi_category <- factor(cleaned_data_model$bmi_category, 
                             levels = c("Underweight", "Normal", "Overweight", "Obese"))
 ggplot(cleaned_data_model, aes(x = gender, fill = bmi_category)) +
-  geom_bar(position = "fill") +  # 'fill' makes it a proportion plot
+  geom_bar(position = "fill") +  
   ylab("Proportion") +
   xlab("Gender") +
-  labs(title = "Proportions of BMI Categories by Gender") +
-  scale_y_continuous(labels = scales::percent) +  # Converts y-axis to percentage format
+  scale_y_continuous(labels = scales::percent) +
   theme_minimal()
 ```
 
@@ -126,15 +121,17 @@ ggplot(cleaned_data_model, aes(x = gender, fill = bmi_category)) +
 #| eval: true
 #| warning: false
 #| message: false
+#| label: fig-prop-whr-gender
+#| fig-cap: "Distribution of Waist-to-Hip Ratio by Gender and Proxy Fat Percentage"
+
 cleaned_data_model$gender <- factor(cleaned_data_model$gender, labels = c("Female", "Male"))
 ggplot(cleaned_data_model, aes(x = gender, y = waist_hip_ratio, fill = gender)) +
   geom_boxplot() +
   ylab("Waist-to-Hip Ratio") +
   xlab("Gender") +
-  labs(title = "Distribution of Waist-to-Hip Ratio by Gender") +
   theme_minimal() +
   facet_wrap(~fat_percentage_category) + 
-  scale_fill_manual(values = c("female" = "lightblue", "male" = "lightgreen"))
+  scale_fill_manual(values = c("Female" = "lightblue", "Male" = "lightgreen"))
 ```
 
 ```{r}
@@ -142,7 +139,9 @@ ggplot(cleaned_data_model, aes(x = gender, y = waist_hip_ratio, fill = gender)) 
 #| eval: true
 #| warning: false
 #| message: false
-# cleaned_data_model$gender <- factor(cleaned_data_model$gender, labels = c("Female", "Male"))
+#| label: fig-prop-hhr-gender
+#| fig-cap: "Distribution of Height-Hip-Ratio by Gender and Proxy BMI"
+
 
 cleaned_data_model$bmi_category <- factor(cleaned_data_model$bmi_category, 
                             levels = c("Underweight", "Normal", "Overweight", "Obese"))
@@ -153,17 +152,29 @@ ggplot(cleaned_data_model, aes(x = gender, y = height_hip_ratio, fill = gender))
   labs(title = "Distribution of Waist-to-Hip Ratio by Gender") +
   theme_minimal() +
   facet_wrap(~bmi_category) + 
-  scale_fill_manual(values = c("female" = "lightblue", "male" = "lightgreen"))
+  scale_fill_manual(values = c("Female" = "lightblue", "Male" = "lightgreen"))
 ```
+
+### The estimand for the model
+
+Using the above predictor variables, I constructed the variable `fat_percentage_category` as I recruit a multilevel linear regression model to classify the body fat. I decided to use a categorical variable as the estimand to produced useful comparisons against other categorical variables such as sex, height categories and weight categories. Additionally, `fat_percentage_category` was constructed using BMI as a proxy to gauge fat levels in a person. BMI is still widely used in medical scenarios to provide general diagnosis of health levels so I used that as a base to study the interactions between current systems and new offerings of WHR and height_hip_ratio. The relationship between `fat_percentage_category` and BMI was considered to be relatively straightforward to mimick the nature of the current applications of BMI. For BMI, I chose to consider the categories, `underweight`, `normal`, `overweight` and `obese`. These were calculated using the BMI formula: 
+
+\begin{align}
+\text{BMI} = \frac{\text{weight (kg)}}{\left(\frac{\text{height (cm)}}{100}\right)^2}
+\end{align}
+
+No difference between the genders was considered. Obesity categories using BMI consists of Obese I, Obese II and Obese III as they cause the increasing obesity relating such as diabetes, fatty liver and Osteoarthritis [@NIDDK2024]. However, due to the lack of data points for Obesity II and III, I chose to categorize all levels of obesity within the same `obesity` category.
+
+
+
 
 ```{r}
 #| echo: false
 #| eval: true
 #| warning: false
 #| message: false
-# filtered_data <- subset(cleaned_data_model, bmi_category %in% c("Overweight", "Obese"))
-
-# Create a combined boxplot to visualize differences in ankle and wrist for bmi_category = Overweight and Obese
+#| label: fig-prop-ankle-wrist
+#| fig-cap: "Comparison of Ankle and Wrist Measurements for BMI Categories"
 
 cleaned_data_model$bmi_category <- factor(cleaned_data_model$bmi_category, 
                             levels = c("Underweight", "Normal", "Overweight", "Obese"))
@@ -177,24 +188,26 @@ ggplot(long_data, aes(x = bmi_category, y = Value, fill = bmi_category)) +
   facet_wrap(~ Measurement) +  # This creates separate panels for 'ankle' and 'wrist'
   ylab("Measurement Value") +
   xlab("BMI Category") +
-  labs(title = "Comparison of Ankle and Wrist Measurements for Overweight and Obese BMI Categories") +
   theme_minimal() +
-  scale_fill_manual(values = c("Overweight" = "lightcoral", "Obese" = "lightsalmon")) +
   theme(legend.position = "none")
 ```
 
 ### Measurement of Data
 
+From the 3 data sets, I used the training data set in which the subjects were 3D scanned and photographed by lab technicians. These photographs where then put through the ABS simulator for the orginal purposes of this study. All test subjects were required to wear tight body-fitting clothing and asked to stand in an "A" pose to maintain uniformity.
+
 
 ## Body Composition Data - Isaac Kuzmar Et Al.
 
-The data set compiles the body measurements of subjects aged, 18 and 60, and specifically with a desire to lose weight and improve body image. The participants resided in Barranquilla, Colombia and consisted of 234 males and 111 females. Medical exclusions were made while recruiting the subjects, such as pregnant women or people with medical pacemakers. The bodily measurements such as fat mass in kilograms and fat free mas in kilograms were determined using the Tanita MC-780 \[reference\] body composition analyzer.
+The data set compiles the body measurements of subjects aged, 18 and 60, and specifically with a desire to lose weight and improve body image. The participants resided in Barranquilla, Colombia and consisted of 234 males and 111 females. Medical exclusions were made while recruiting the subjects, such as pregnant women or people with medical pacemakers. The bodily measurements such as fat mass in kilograms and fat free mas in kilograms were determined using the Tanita MC-780 [@Kuzmar2020] body composition analyzer.
 
 ### The variables of my use:
 
-The main variables that I considered fat mass percentage fm. This variable is obtained by dividing the fat mass in kilogram by the total weight in kilograms. The fat mass percentage is considered the main predictor for fat mass categories. As the body composition is more accuarate at measuring the actual amount of excess fat a person carries and can differentiate it from other weights such as fat free muscle mass \[reference the variable\] \#### graph what i will be using in my model
+The main variables that I considered fat mass percentage `fm`. This variable is obtained by dividing the fat mass in kilogram by the total weight in kilograms. The fat mass percentage is considered the main predictor for fat mass categories. As the body composition is more accurate at measuring the actual amount of excess fat a person carries and can differentiate it from other weights such as fat free muscle mass and total body weight. `age`, `height` and `gender` are also considered as predictor variables. As a person ages, their fat storing capabilities as well as their metabolism changes. While this cannot be directly measured through the data set, I used age and gender of a person to define the inital classification of the independant variable.
 
 ### The estimand for the model
+
+To make this model comparable to the Measurements Model, `fat_percentage_category` is the estimand as well. I considered a different proxy for `fat_percentage_category`. Afterwards, after fitting other variables such `age`, `height` and `gender`, the model predicted new categories.
 
 
 ```{r}
@@ -202,7 +215,9 @@ The main variables that I considered fat mass percentage fm. This variable is ob
 #| eval: true
 #| warning: false
 #| message: false
-# Recode gender levels
+#| label: fig-bmi-2-gender
+#| fig-cap: "Proportions of BMI Categories by Gender"
+#| 
 body_mass_model_data_section <- body_mass_model %>%
   mutate(gender = factor(gender, levels = c(1, 2), labels = c("Male", "Female"))) %>%
   mutate(fat_percentage_category = factor(fat_percentage_category,
@@ -216,36 +231,24 @@ ggplot(body_mass_model_data_section, aes(x = gender, fill = fat_percentage_categ
   geom_bar(position = "fill") +  # 'fill' makes it a proportion plot
   ylab("Proportion") +
   xlab("Gender") +
-  labs(title = "Proportions of BMI Categories by Gender") +
   scale_y_continuous(labels = scales::percent) +  # Converts y-axis to percentage format
   theme_minimal()
 ```
 
-```{r}
-#| echo: false
-#| eval: true
-#| warning: false
-#| message: false
-ggplot(body_mass_model, aes(x = weight, y = height, color = fm)) +
-  geom_point(size = 3) +
-  scale_color_viridis_c() + # Use a continuous color scale
-  labs(title = "Height vs Weight with Fat Mass",
-       x = "Weight",
-       y = "Height",
-       color = "Fat Mass (fm)") +
-  theme_minimal()
-```
 
 ```{r}
 #| echo: false
 #| eval: true
 #| warning: false
 #| message: false
+#| label: fig-prop-fm-ht-wt
+#| fig-cap: "Relationship between Fat Mass and Height vs Weight"
+
 ggplot(body_mass_model, aes(x = weight, y = height, color = fm, size = fm)) +
   geom_point(alpha = 0.7) +
   scale_color_viridis_c() +
   scale_size_continuous(range = c(1, 10)) +
-  labs(title = "Height vs Weight with Fat Mass",
+  labs(
        x = "Weight",
        y = "Height",
        color = "Fat Mass (fm)",
@@ -253,26 +256,14 @@ ggplot(body_mass_model, aes(x = weight, y = height, color = fm, size = fm)) +
   theme_minimal()
 ```
 
-```{r}
-#| echo: false
-#| eval: true
-#| warning: false
-#| message: false
-ggplot(body_mass_model, aes(x = bmi, y = fm, color = gender)) +
-  geom_point(alpha = 0.7) +
-  facet_wrap(~ gender) +
-  labs(title = "Fat Mass vs BMI by Gender",
-       x = "BMI",
-       y = "Fat Mass (fm)",
-       color = "Gender") +
-  theme_minimal()
-```
 
 ```{r}
 #| echo: false
 #| eval: true
 #| warning: false
 #| message: false
+#| label: fig-prop-smoothed-bmi
+#| fig-cap: "Smoothed Trends of FM and BMI by Gender"
 body_mass_long <- body_mass_model %>%
   pivot_longer(cols = c(fm, bmi), names_to = "measure", values_to = "value")
 
@@ -280,73 +271,20 @@ body_mass_long <- body_mass_model %>%
 ggplot(body_mass_long, aes(x = weight, y = value, color = measure)) +
   geom_point(alpha = 0.5) + # Optional: Add points for raw data
   geom_smooth(se = FALSE, method = "loess", span = 0.5) + # Smoothed trendline
-  labs(title = "Smoothed Trends of FM and BMI by Age",
-       x = "weight",
-       y = "Value",
+  labs(
+       x = "Weight in kg",
+       y = "BMI",
        color = "Measure") +
   theme_minimal() +
   facet_wrap(~gender)
 
 ```
 
--   talk about the crowding for men
+The figures: @fig-bmi-2-gender, @fig-prop-fm-ht-wt and @fig-prop-smoothed-bmi graph the 4 predictor variables of my interest for the subsequent model. @fig-prop-smoothed-bmi is a motivating factor in recognizing that gender plays an important role in conducting analysis for Body Fat with relevance to current clinical diagnostic tools such as BMI.
 
-```{r}
-#| echo: false
-#| eval: true
-#| warning: false
-#| message: false
-# Combine both datasets
-cleaned_test_extract <- cleaned_data_model %>%
-  select(gender, bmi_category, fat_percentage_category)
-body_mass_extracted <- body_mass_model %>%
-  select(gender, bmi_category, fat_percentage_category)
-cleaned_test_extract$dataset <- "Measurements"
-body_mass_extracted$dataset <- "Body Data"
-combined_data <- rbind(cleaned_test_extract, body_mass_extracted)
-
-
-# Count occurrences of each fat_percentage_category per dataset
-library(dplyr)
-category_counts <- combined_data %>%
-  group_by(dataset, fat_percentage_category) %>%
-  summarise(Count = n(), .groups = "drop")
-
-# Create a bar plot to visualize the differences
-library(ggplot2)
-ggplot(category_counts, aes(x = fat_percentage_category, y = Count, fill = dataset)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  labs(title = "Comparison of Fat Percentage Categories Across Data1 and Data2",
-       x = "Fat Percentage Category", y = "Count") +
-  theme_minimal() +
-  scale_fill_manual(values = c("Measurements" = "lightblue", "Body Data" = "lightgreen"))
-
-
-proportions <- combined_data %>%
-  group_by(dataset, fat_percentage_category) %>%
-  summarise(Count = n(), .groups = "drop") %>%
-  mutate(Proportion = Count / sum(Count))
-
-# Create a bar plot to visualize the proportions
-ggplot(proportions, aes(x = fat_percentage_category, y = Proportion, fill = dataset)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  labs(title = "Proportional Comparison of Fat Percentage Categories Across Data1 and Data2",
-       x = "Fat Percentage Category", y = "Proportion") +
-  scale_y_continuous(labels = scales::percent) +  # Show proportions as percentages
-  theme_minimal() +
-  scale_fill_manual(values = c("Measurements" = "lightblue", "Body Data" = "lightgreen"))
-```
-
-Overview text
-
-
-```{r}
-#| warning: false
-#| message: false
-#| echo: false
-```
 
 ### Measurement of Data
+Height in centimeters and fat mass values were obtained using the Tanita MC-780MA medical equipment.
 
 \newpage
 
@@ -579,7 +517,7 @@ ggplot(combined_confusion_matrix, aes(x = predicted_category, y = fat_percentage
 
 ```
 
-The [Confusion Matrix](@fig-conf-matrix) shows the difference in the prediction of the fat percentage category by each model. Here, we can see that the Body Composition Data is mostly consistent with its prediction apart from a few key nuances. The diagonal values in the Body Compositions show high correlation between the body fat percentage and the classification. This is expected as this model serves as a comparison to the Measurements Model. However, it can be noted that there is a spill between Moderate and High levels of body fat. The model predicts the Extreme category the closest. On the other hand, there is more obvious spill over between categories using the measurements model. The diagonal values have lighter colours based on the Confusion Matrix Colour Legend. This could suggest that the introduction of adipose and anthropocentric differs in predicting fat in the body as compared to its proxy, BMI. The same hate map [faceted by gender](@fig-heat-map-gender), highlights that the BMI proxy in Measurements Model seems to be under performing for females causing more classifications. This could be alluded from the fact that BMI was created with only male subjects under consideration \[todo reference\].
+The [Confusion Matrix](@fig-conf-matrix) shows the difference in the prediction of the fat percentage category by each model. Here, we can see that the Body Composition Data is mostly consistent with its prediction apart from a few key nuances. The diagonal values in the Body Compositions show high correlation between the body fat percentage and the classification. This is expected as this model serves as a comparison to the Measurements Model. However, it can be noted that there is a spill between Moderate and High levels of body fat. The model predicts the Extreme category the closest. On the other hand, there is more obvious spill over between categories using the measurements model. The diagonal values have lighter colours based on the Confusion Matrix Colour Legend. This could suggest that the introduction of adipose and anthropocentric differs in predicting fat in the body as compared to its proxy, BMI. The same hate map [faceted by gender](@fig-heat-map-gender), highlights that the BMI proxy in Measurements Model seems to be under performing for females causing more classifications. This could be alluded from the fact that BMI was created with only male subjects under consideration [@Pray2023].
 
 ```{r}
 #| echo: false

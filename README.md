@@ -4,6 +4,10 @@
 
 This paper focuses on what BMI values fail to acknowledge the different body composition across both sexes. Using the Waist-Hip-Ratio is more accurate at estimating body fat levels using simple methods at home. This paper compares how this model performs against actual body composition such as isolated fat mass. Using this method makes self-identification of obsesity more accessible and preventive measures can be taken earlier.
 
+## Data
+To access the data used in this paper, follow the following steps:
+
+
 ## File Structure
 
 The repo is structured as:
