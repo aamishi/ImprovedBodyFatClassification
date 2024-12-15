@@ -7,6 +7,19 @@ This paper focuses on what BMI values fail to acknowledge the different body com
 ## Data
 To access the data used in this paper, follow the following steps:
 
+### BodyM Data (Measurements data) Via AWS:
+
+1. Navigate to this repo on your terminal and run the following command.
+`aws s3 cp --no-sign-request s3://amazon-bodym/train/ ./data/raw_data/local-train --recursive`
+
+### Body Composition Data
+
+1. The Research Paper for which this data was collected has made the data available for download here:
+`https://figshare.com/articles/dataset/DATASET_FOR_NEW_BODY_FAT_MEASUREMENT/12982223/2`
+2. Once you download and extract the contents of the `.zip` file, cut and paste the file `DATASET FOR NEW BODY FAT MEASUREMENT.csv` (including spaces) into the data/raw_data folder
+
+Once you have both data sets downloaded, you can proceed with the scripts! I hope you enjoy this paper!
+
 
 ## File Structure
 
